@@ -1,0 +1,30 @@
+{
+  "name": "taskhubjs",
+  "version": "1.0.0",
+  "description": "A new and easy way to organize your tasks with NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holzigerTyp/TaskHubJS.git"
+  },
+  "author": "holzigerTyp",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/holzigerTyp/TaskHubJS/issues"
+  },
+  "homepage": "https://github.com/holzigerTyp/TaskHubJS#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "chalk": "^4.1.0",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "hbs": "^4.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "readline-sync": "^1.4.10"
+  }
+}
