@@ -11,6 +11,7 @@ var version = undefined
 
 
 // Init //
+const moment        = require('moment');
 const taskHandler   = require('./taskhandler')
 const cookieparser  = require('cookie-parser')
 const jwt           = require('jsonwebtoken')
@@ -47,20 +48,16 @@ function printLogo() {
     console.log("")
 }
 function log(msg) {
-    const timestamp = new Date()
-    console.log("[" + timestamp.getDay() + "/" + timestamp.getMonth() + "/" + timestamp.getFullYear() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds() + "] " + msg)
+    console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + msg)
 }
 function logErr(msg) {
-    const timestamp = new Date()
-    console.log("[" + timestamp.getDay() + "/" + timestamp.getMonth() + "/" + timestamp.getFullYear() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds() + "] " + chalk.red(msg))
+    console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + chalk.red(msg))
 }
 function logSuc(msg) {
-    const timestamp = new Date()
-    console.log("[" + timestamp.getDay() + "/" + timestamp.getMonth() + "/" + timestamp.getFullYear() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds() + "] " + chalk.green(msg))
+    console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + chalk.green(msg))
 }
 function logCyan(msg) {
-    const timestamp = new Date()
-    console.log("[" + timestamp.getDay() + "/" + timestamp.getMonth() + "/" + timestamp.getFullYear() + " " + timestamp.getHours() + ":" + timestamp.getMinutes() + ":" + timestamp.getSeconds() + "] " + chalk.cyan(msg))
+    console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + chalk.cyan(msg))
 }
 
 function checkAuthentification(token, callback) {
@@ -192,8 +189,7 @@ function setupMySQLDatabase() {
 
 // MySQL functions //
 function mysql_updatelogintimestamp(username) {
-    var date = new Date()
-    var timestamp = date.getDay() + "/" + date.getMonth() + "/" + date.getFullYear() + "/" + date.getHours() + "/" + date.getMinutes() + "/" + date.getSeconds()
+    var timestamp = moment().format('DD/MM/YYYY/HH/mm/ss')
     var sql = "UPDATE `accounts` SET `timestampLastLogin`='" + timestamp + "' WHERE `username`='" + username + "'"
     connection.query(sql, function (error, results, fields) {
         if (error) {
