@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>TaskHubJS</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
+    <link rel="stylesheet" href="/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
+    <link rel="stylesheet" href="/css/styles.min.css">
+    <link rel="stylesheet" href="/css/smoothproducts.css">
+</head>
+
+<body style="background: rgb(246,246,246);">
+    <nav class="navbar navbar-light navbar-expand-lg fixed-top bg-white clean-navbar">
+        <div class="container"><a class="navbar-brand logo" href="#">TaskHubJS</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse"
+                id="navcol-1">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/management">Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="page product-page">
+        <section class="clean-block clean-product dark">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Task details</h2>
+                </div>
+                <div class="block-content">
+                    <div class="product-info">
+                        <div class="info">
+                            <a class="btn btn-primary" href="/dashboard" style="margin-bottom: 60px"><i class="fa fa-arrow-circle-left"></i>Back to dashboard</a>
+                            <h3 id="sys-title"></h3>
+                            <div class="rating">
+                                <p style="color: black;" id="sys-timestamp"></p>
+                            </div>
+                            <div class="price">
+                                <h3 id="sys-priority"></h3>
+                                <h3 id="sys-status"></h3>
+                            </div>
+                            <div class="summary"></div>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist" id="myTab">
+                                <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-toggle="tab" id="description-tab" href="#description">Description</a></li>
+                                <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-toggle="tab" id="specifications-tabs" href="#specifications">Settings</a></li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane active fade show description" role="tabpanel" id="description">
+                                    <h4 style="margin-top: 0px;">Description</h4>
+                                    <p id="sys-description"></p>
+                                </div>
+                                <div class="tab-pane fade show specifications" role="tabpanel" id="specifications">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col"><form method="post" id="sys-prio"><select style="width:200px" id="priority" name="priority"><option value="0">Low priority</option><option value="1">Normal priority</option><option value="2">Urgent priority</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change priority</button></form></div>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col"><form method="post" id="sys-stat"><select style="width:200px" id="status" name="status"><option value="0" selected="">Open</option><option value="1">In progress</option><option value="2">Finished</option><option value="3">Information</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change status</button></form></div>
+                                    </div>
+                                    <div class="row" style="margin-top: 50px;">
+                                        <div class="col"><a class="btn btn-danger" id="sys-delete"><i class="fa fa-trash"></i>Remove task</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="page-footer dark" style="padding: 0px;">
+        <div class="footer-copyright">
+            <p>Created by holzigerTyp with&nbsp;💙 and Bootstrap Studio Template<br></p>
+        </div>
+    </footer>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
+    <script src="/js/script.min.js"></script>
+    <script>
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:4000/api/gettaskdetail/" + window.location.href.slice(-1),
+            crossDomain: false,
+            dataType: "json",
+            success: function(data) {
+                for (i = 0; i < data.length; i++) {
+                    var stat = "Error"
+                    var col = ""
+                    if(data[i].status == 0) {
+                        stat = "Open"
+                        col = "primary"
+                    } else if(data[i].status == 1) {
+                        stat = "In progress"
+                        col = "warning"
+                    } else if(data[i].status == 2) {
+                        stat = "Finished"
+                        col = "success"
+                    } else if(data[i].status == 3) {
+                        stat = "Information"
+                        col = "info"
+                    }
+
+
+                    var prio = "Error"
+                    var colPrio = ""
+                    if(data[i].priority == 0) {
+                        prio = "Low"
+                        colPrio = "secondary"
+                    } else if(data[i].priority == 1) {
+                        prio = "Normal"
+                        colPrio = "info"
+                    } else if(data[i].priority == 2) {
+                        prio = "Urgent"
+                        colPrio = "danger"
+                    }
+
+                    document.getElementById("sys-title").innerText = data[i].title
+                    document.getElementById("sys-description").innerText = data[i].description
+                    var time = data[i].timestampCreated.split("/")
+                    document.getElementById("sys-timestamp").innerText = "Created at " + time[0] + "." + time[1] + "." + time[2] + " " + time[3] + ":" + time[4] + ":" + time[5]
+                    document.getElementById("sys-priority").innerHTML = 'Priority:&nbsp;<span class="badge badge-' + colPrio + '">' + prio + '</span>'
+                    document.getElementById("sys-status").innerHTML = 'Status:&nbsp;<span class="badge badge-' + col + '">' + stat + '</span>'
+                    document.getElementById("sys-delete").href = '/api/deletetask/' + window.location.href.slice(-1) 
+                    document.getElementById("sys-stat").action = '/api/changestatus/' + window.location.href.slice(-1) 
+                    document.getElementById("sys-prio").action = '/api/changepriority/' + window.location.href.slice(-1) 
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
