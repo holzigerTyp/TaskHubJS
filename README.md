@@ -19,6 +19,14 @@ npm i
 ```sh
 npm start
 ```
+3. Follow the instructions of the setup
+4. After setup login into TaskHubJS with the following credentials
+```sh
+Username: admin
+Password: taskhubadmin
+```
+5. Navigate to the management section and change the admin password to something different.
+6. Enjoy using TaskHubJS :)
 
 ## Planed features
 ❌ Sort tasks by status or priority
