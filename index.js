@@ -33,7 +33,8 @@ let default_config = {
     mysql_port: 3306,
     mysql_username: "",
     mysql_password: "",
-    mysql_database: "taskhubjs"
+    mysql_database: "taskhubjs",
+    taskhubjs_debug_output: false
 }
 
 
@@ -155,6 +156,7 @@ function setupMySQLConnection() {
         }
        
         logSuc('MySQL connection as ID ' + connection.threadId + ' successful');
+        if(config.taskhubjs_debug_output == true) logCyan("Activated debug output by config")
 
         app.listen(port, function() {
             logSuc("Webserver started successful. View webpage at http://localhost:" + port)
@@ -202,6 +204,16 @@ function setupMySQLDatabase() {
       });
 
     logSuc("MySQL table validation finished.")
+}
+function debugOutput() {
+    var rawdata = fs.readFileSync('config.json');
+    var config = JSON.parse(rawdata);
+    if(config.taskhubjs_debug_output == true) {
+        app.use(function(req, res, next) {
+            if(!req.url.includes(".css") && !req.url.includes(".js") && !req.url.includes(".woff2") && !req.url.includes(".jpg") && !req.url.includes(".ico")) logCyan("GET -> "+ req.url + " -> " + req.ip)
+            next()
+        })
+    }
 }
 
 // MySQL functions //
@@ -305,10 +317,7 @@ function mysql_changepriority(taskid, priority) {
 }
 
 // Express //
-app.use(function(req, res, next) {
-    if(!req.url.includes(".css") && !req.url.includes(".js") && !req.url.includes(".woff2") && !req.url.includes(".jpg") && !req.url.includes(".ico")) logCyan("GET -> "+ req.url + " -> " + req.ip)
-    next()
-})
+debugOutput()
 
 app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
