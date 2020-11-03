@@ -26,9 +26,9 @@ const csrf          = require("csurf")
 var connection      = undefined
 
 var protector           = []
-var protector_cooldown  = 0.20
-
-var general_cooldown    = 250
+var protector_req       = []
+var protector_cooldown  = 1
+var protector_req_amo   = 4
 
 let default_config = {
     mysql_hostname: "localhost",
@@ -102,19 +102,28 @@ function getUsername(token, callback) {
 
 function isBlocked(ip) {
     if(protector[ip] != undefined) {
-        var now = moment(new Date())
-        var end = moment(protector[ip])
-
-        var duration = moment.duration(now.diff(end))
-        var secs = duration.asSeconds()
-
-        protector[ip] = moment()
-
-        if(secs > protector_cooldown) {
+        if(protector_req[ip] != protector_req_amo) {
+            protector_req[ip] = protector_req[ip] + 1
             return false
-        } else return true
+        } else if(protector_req[ip] == protector_req_amo) {
+            var now = moment(new Date())
+            var end = moment(protector[ip])
+
+            var duration = moment.duration(now.diff(end))
+            var secs = duration.asSeconds()
+
+            if(secs > protector_cooldown) {
+                protector[ip] = moment()
+                protector_req[ip] = 1
+                return false
+            } else {
+                protector[ip] = moment()
+                return true
+            }
+        }
     } else {
         protector[ip] = moment()
+        protector_req[ip] = 1
         return false
     }
 }
@@ -325,8 +334,15 @@ app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(cookiesession({ secret: "g28tuqfGHS)$MGS)Zjiugjnw" }))
+
+// Protector //
+app.use(function(req, res, next) {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else next()
+})
+
+// csurf //
 app.use(csrf())
-app.use(cookieparser())
 app.use(function(err, req, res, next) {
     if (err.code !== 'EBADCSRFTOKEN') return next(err)
  
@@ -337,6 +353,8 @@ app.use(function(req, res, next) {
     res.locals.csrftoken = req.csrfToken()
     next()
 })
+
+app.use(cookieparser())
 app.set('view engine', 'ejs')
 
 app.get("/", function(req, res) {
@@ -412,8 +430,7 @@ app.get("/createtask", function(req, res) {
 app.post("/api/auth", function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else connection.query("SELECT * FROM `accounts` WHERE `username`=?", username, function (error, results, fields) {
+    connection.query("SELECT * FROM `accounts` WHERE `username`=?", username, function (error, results, fields) {
         if (error) logErr(error)
         else {
             if(results.length == 1) {
@@ -427,7 +444,7 @@ app.post("/api/auth", function(req, res) {
                             httpOnly: true
                         })
                         updateAuthentification(username, token)
-                        setTimeout(() => res.status(200).redirect("/dashboard"), general_cooldown)
+                        res.status(200).redirect("/dashboard")
                     } else res.redirect("/login")
                 })
             } else res.redirect("/login")
@@ -435,30 +452,27 @@ app.post("/api/auth", function(req, res) {
       });
 })
 app.post("/api/createtask", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             var title = req.body.title
             var description = req.body.description
             getUsername(req.cookies.auth, (username) => {
                 taskHandler.createTask(connection, title, description, 1, username)
-                setTimeout(() => { res.redirect("/dashboard") }, general_cooldown)
+                res.redirect("/dashboard")
             })
         } else res.redirect("/login")
     })  
 })
 app.get("/api/deletetask/:id", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_deletetask(req.params.id)
-            setTimeout(() => res.redirect("/dashboard"), general_cooldown)
+            res.redirect("/dashboard")
         } else res.redirect("/login")
     })  
 })
 app.get("/api/gettasks", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_gettasks((list) => {
                 res.setHeader("Content-Type", "application/json")
@@ -468,8 +482,7 @@ app.get("/api/gettasks", function(req, res) {
     })  
 })
 app.get("/api/gettaskdetail/:id", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_gettaskdetails(req.params.id, (list) => {
                 res.setHeader("Content-Type", "application/json")
@@ -479,8 +492,7 @@ app.get("/api/gettaskdetail/:id", function(req, res) {
     })  
 })
 app.get("/api/getaccounts", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
@@ -495,8 +507,7 @@ app.get("/api/getaccounts", function(req, res) {
     })  
 })
 app.post("/api/createaccount", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
@@ -504,58 +515,54 @@ app.post("/api/createaccount", function(req, res) {
                     var password = req.body.password
                     var prev = req.body.prev
                     mysql_createaccount(username, password, prev)
-                    setTimeout(() => res.redirect("/management"), general_cooldown)
+                    res.redirect("/management")
                 } else res.render("error-rank")
             })
         } else res.redirect("/login")
     })  
 })
 app.get("/api/deleteaccount/:id", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
                     mysql_deleteaccount(req.params.id)
-                    setTimeout(() => res.redirect("/management#accounts"), general_cooldown)
+                    res.redirect("/management")
                 } else res.render("error-rank")
             })
         } else res.redirect("/login")
     })  
 })
 app.post("/api/changeadminpassword", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
                     var password = req.body.password
                     mysql_changeadminpassword(password)
-                    setTimeout(() => res.redirect("/management"), general_cooldown)
+                    res.redirect("/management")
                 } else res.render("error-rank")
             })
         } else res.redirect("/login")
     })  
 })
 app.post("/api/changestatus/:id", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             var status = req.body.status
             var id = req.params.id
             mysql_changestatus(id, status)
-            setTimeout(() => res.redirect("/dashboard/" + id), general_cooldown)
+            res.redirect("/dashboard/" + id)
         } else res.redirect("/login")
     })  
 })
 app.post("/api/changepriority/:id", function(req, res) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else checkAuthentification(req.cookies.auth, (result) => {
+    checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             var priority = req.body.priority
             var id = req.params.id
             mysql_changepriority(id, priority)
-            setTimeout(() => res.redirect("/dashboard/" + id), general_cooldown)
+            res.redirect("/dashboard/" + id)
         } else res.redirect("/login")
     })  
 })
