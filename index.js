@@ -23,6 +23,11 @@ const mysql         = require("mysql")
 const chalk         = require("chalk")
 var connection      = undefined
 
+var protector           = []
+var protector_cooldown  = 0.20
+
+var general_cooldown    = 250
+
 let default_config = {
     mysql_hostname: "localhost",
     mysql_port: 3306,
@@ -64,8 +69,8 @@ function checkAuthentification(token, callback) {
     } else callback(0)
 }
 function updateAuthentification(username, token) {
-    var sql = "UPDATE `accounts` SET `authToken`='" + token + "' WHERE `username`='" + username + "'"
-    connection.query(sql, function (error, results, fields) {
+    var sql = "UPDATE `accounts` SET `authToken`=? WHERE `username`=?"
+    connection.query(sql, [token, username], function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -73,8 +78,8 @@ function updateAuthentification(username, token) {
     })
 }
 function removeAuthentification(currentToken) {
-    var sql = "UPDATE `accounts` SET `authToken`='0' WHERE `authToken`='" + currentToken + "'"
-    connection.query(sql, function (error, results, fields) {
+    var sql = "UPDATE `accounts` SET `authToken`='0' WHERE `authToken`=?"
+    connection.query(sql, currentToken, function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -89,6 +94,25 @@ function getUsername(token, callback) {
                 callback(results[0].username)
             }
           });
+    }
+}
+
+function isBlocked(ip) {
+    if(protector[ip] != undefined) {
+        var now = moment(new Date())
+        var end = moment(protector[ip])
+
+        var duration = moment.duration(now.diff(end))
+        var secs = duration.asSeconds()
+
+        protector[ip] = moment()
+
+        if(secs > protector_cooldown) {
+            return false
+        } else return true
+    } else {
+        protector[ip] = moment()
+        return false
     }
 }
 
@@ -183,8 +207,8 @@ function setupMySQLDatabase() {
 // MySQL functions //
 function mysql_updatelogintimestamp(username) {
     var timestamp = moment().format('DD/MM/YYYY/HH/mm/ss')
-    var sql = "UPDATE `accounts` SET `timestampLastLogin`='" + timestamp + "' WHERE `username`='" + username + "'"
-    connection.query(sql, function (error, results, fields) {
+    var sql = "UPDATE `accounts` SET `timestampLastLogin`=? WHERE `username`=?"
+    connection.query(sql, [timestamp,username], function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -200,8 +224,8 @@ function mysql_gettasks(callback) {
     });
 }
 function mysql_gettaskdetails(id, callback) {
-    var sql = 'SELECT * FROM `tasks` WHERE `ID`=' + id
-    connection.query(sql, function (error, results, fields) {
+    var sql = 'SELECT * FROM `tasks` WHERE `ID`=?'
+    connection.query(sql, id, function (error, results, fields) {
         if (error) logErr(error)
         else {
             callback(results)
@@ -232,8 +256,8 @@ function mysql_changeadminpassword(password) {
     })
 }
 function mysql_deletetask(id) {
-    var sql = "DELETE FROM `tasks` WHERE `ID`=" + id
-    connection.query(sql, function (error, results, fields) {
+    var sql = "DELETE FROM `tasks` WHERE `ID`=?"
+    connection.query(sql, id, function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -253,8 +277,8 @@ function mysql_getrank(token, callback) {
     } else callback(0)
 }
 function mysql_deleteaccount(id) {
-    var sql = "DELETE FROM `accounts` WHERE `UID`=" + id
-    connection.query(sql, function (error, results, fields) {
+    var sql = "DELETE FROM `accounts` WHERE `UID`=?"
+    connection.query(sql, id, function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -262,8 +286,8 @@ function mysql_deleteaccount(id) {
     })
 }
 function mysql_changestatus(taskid, status) {
-    var sql = "UPDATE `tasks` SET `status`=" + status + " WHERE `ID`=" + taskid
-    connection.query(sql, function (error, results, fields) {
+    var sql = "UPDATE `tasks` SET `status`=? WHERE `ID`=?"
+    connection.query(sql, [status,taskid], function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -271,8 +295,8 @@ function mysql_changestatus(taskid, status) {
     })
 }
 function mysql_changepriority(taskid, priority) {
-    var sql = "UPDATE `tasks` SET `priority`=" + priority + " WHERE `ID`=" + taskid
-    connection.query(sql, function (error, results, fields) {
+    var sql = "UPDATE `tasks` SET `priority`=? WHERE `ID`=?"
+    connection.query(sql, [priority,taskid], function (error, results, fields) {
         if (error) {
             logErr(error)
             return false
@@ -365,7 +389,8 @@ app.get("/createtask", function(req, res) {
 app.post("/api/auth", function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    connection.query("SELECT * FROM `accounts` WHERE `username`=?", username, function (error, results, fields) {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else connection.query("SELECT * FROM `accounts` WHERE `username`=?", username, function (error, results, fields) {
         if (error) logErr(error)
         else {
             if(results.length == 1) {
@@ -387,27 +412,30 @@ app.post("/api/auth", function(req, res) {
       });
 })
 app.post("/api/createtask", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             var title = req.body.title
             var description = req.body.description
             getUsername(req.cookies.auth, (username) => {
                 taskHandler.createTask(connection, title, description, 1, username)
+                setTimeout(() => { res.redirect("/dashboard") }, general_cooldown)
             })
-            res.redirect("/dashboard")
         } else res.redirect("/login")
     })  
 })
 app.get("/api/deletetask/:id", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_deletetask(req.params.id)
-            res.redirect("/dashboard")
+            setTimeout(() => res.redirect("/dashboard"), general_cooldown)
         } else res.redirect("/login")
     })  
 })
 app.get("/api/gettasks", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_gettasks((list) => {
                 res.setHeader("Content-Type", "application/json")
@@ -417,7 +445,8 @@ app.get("/api/gettasks", function(req, res) {
     })  
 })
 app.get("/api/gettaskdetail/:id", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_gettaskdetails(req.params.id, (list) => {
                 res.setHeader("Content-Type", "application/json")
@@ -427,7 +456,8 @@ app.get("/api/gettaskdetail/:id", function(req, res) {
     })  
 })
 app.get("/api/getaccounts", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
@@ -442,7 +472,8 @@ app.get("/api/getaccounts", function(req, res) {
     })  
 })
 app.post("/api/createaccount", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
@@ -450,54 +481,58 @@ app.post("/api/createaccount", function(req, res) {
                     var password = req.body.password
                     var prev = req.body.prev
                     mysql_createaccount(username, password, prev)
-                    res.redirect("/management")
+                    setTimeout(() => res.redirect("/management"), general_cooldown)
                 } else res.render("error-rank")
             })
         } else res.redirect("/login")
     })  
 })
 app.get("/api/deleteaccount/:id", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
                     mysql_deleteaccount(req.params.id)
-                    res.redirect("/management#accounts")
+                    setTimeout(() => res.redirect("/management#accounts"), general_cooldown)
                 } else res.render("error-rank")
             })
         } else res.redirect("/login")
     })  
 })
 app.post("/api/changeadminpassword", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
                     var password = req.body.password
                     mysql_changeadminpassword(password)
-                    res.redirect("/management")
+                    setTimeout(() => res.redirect("/management"), general_cooldown)
                 } else res.render("error-rank")
             })
         } else res.redirect("/login")
     })  
 })
 app.post("/api/changestatus/:id", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             var status = req.body.status
             var id = req.params.id
             mysql_changestatus(id, status)
-            res.redirect("/dashboard/" + id)
+            setTimeout(() => res.redirect("/dashboard/" + id), general_cooldown)
         } else res.redirect("/login")
     })  
 })
 app.post("/api/changepriority/:id", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
+    if(isBlocked(req.ip)) res.sendStatus(429)
+    else checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
             var priority = req.body.priority
             var id = req.params.id
             mysql_changepriority(id, priority)
-            res.redirect("/dashboard/" + id)
+            setTimeout(() => res.redirect("/dashboard/" + id), general_cooldown)
         } else res.redirect("/login")
     })  
 })
