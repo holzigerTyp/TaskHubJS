@@ -19,12 +19,8 @@ const bcrypt        = require('bcrypt')
 const fs            = require('fs')
 const express       = require("express")
 const app           = express()
-const readline      = require('readline-sync')
 const mysql         = require("mysql")
 const chalk         = require("chalk")
-const { config }    = require('process')
-const { time }      = require('console')
-const { callbackify } = require('util')
 var connection      = undefined
 
 let default_config = {
