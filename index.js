@@ -43,9 +43,6 @@ function printLogo() {
     console.log(chalk.red("TaskHubJS version " + version + " @ https://github.com/holzigerTyp/TaskHubJS"))
     console.log("")
 }
-function log(msg) {
-    console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + msg)
-}
 function logErr(msg) {
     console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + chalk.red(msg))
 }
