@@ -1,4 +1,9 @@
-# TaskHubJS
+<p align="center">
+  <img alt="Logo" src="https://i.imgur.com/62WQJos.png"/></br>
+  <a href="https://lgtm.com/projects/g/holzigerTyp/TaskHubJS/"><img alt="undefined" src="https://img.shields.io/lgtm/grade/javascript/github/holzigerTyp/TaskHubJS.svg?logo=lgtm&logoWidth=18" /></a></br>
+<img alt="undefined" src="https://badgen.net/github/license/holzigertyp/taskhubjs" />  <img alt="undefined" src="https://badgen.net/github/watchers/holzigertyp/taskhubjs" />  <img alt="undefined" src="https://badgen.net/github/commits/holzigertyp/taskhubjs" />
+</p></br>
+
 A new and easy way to organize your tasks with NodeJS
 
 TaskHubJS is a nodeJS based task organizer that is right in your browser.
