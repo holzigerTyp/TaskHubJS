@@ -60,10 +60,10 @@
                                 </div>
                                 <div class="tab-pane fade show specifications" role="tabpanel" id="specifications">
                                     <div class="row" style="margin-bottom: 20px;">
-                                        <div class="col"><form method="post" id="sys-prio"><select style="width:200px" id="priority" name="priority"><option value="0">Low priority</option><option value="1">Normal priority</option><option value="2">Urgent priority</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change priority</button></form></div>
+                                        <div class="col"><form method="post" id="sys-prio"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><select style="width:200px" id="priority" name="priority"><option value="0">Low priority</option><option value="1">Normal priority</option><option value="2">Urgent priority</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change priority</button></form></div>
                                     </div>
                                     <div class="row" style="margin-bottom: 20px;">
-                                        <div class="col"><form method="post" id="sys-stat"><select style="width:200px" id="status" name="status"><option value="0" selected="">Open</option><option value="1">In progress</option><option value="2">Finished</option><option value="3">Information</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change status</button></form></div>
+                                        <div class="col"><form method="post" id="sys-stat"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><select style="width:200px" id="status" name="status"><option value="0" selected="">Open</option><option value="1">In progress</option><option value="2">Finished</option><option value="3">Information</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change status</button></form></div>
                                     </div>
                                     <div class="row" style="margin-top: 50px;">
                                         <div class="col"><a class="btn btn-danger" id="sys-delete"><i class="fa fa-trash"></i>Remove task</a></div>
@@ -88,7 +88,7 @@
     <script>
         $.ajax({
             type: "GET",
-            url: "http://localhost:4000/api/gettaskdetail/" + window.location.href.slice(-1),
+            url: "http://localhost:4000/api/gettaskdetail/" + window.location.href.split("/").pop(),
             crossDomain: false,
             dataType: "json",
             success: function(data) {
@@ -134,7 +134,8 @@
                     document.getElementById("sys-prio").action = '/api/changepriority/' + window.location.href.slice(-1) 
                 }
             }
-        });
+        })
+        
     </script>
 </body>
 

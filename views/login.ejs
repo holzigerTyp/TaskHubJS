@@ -18,9 +18,8 @@
             <div class="collapse navbar-collapse"
                 id="navcol-1">
                 <ul class="nav navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/management">Management</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/login">Login</a></li>
                 </ul>
             </div>
         </div>
@@ -29,11 +28,16 @@
         <section class="clean-block clean-form dark">
             <div class="container">
                 <div class="block-heading">
-                    <h2 class="text-info">Change admin password</h2>
+                    <h2 class="text-info">Log In</h2>
+                    <p>Welcome to TaskHubJS. Please enter your credentials to confirm your identity.</p>
                 </div>
-                <form action="/api/changeadminpassword" method="post">
+                <form action="/api/auth" method="post">
+                    <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
+                    <div class="form-group"><label for="username">Username</label><input class="form-control item" type="text" name="username" id="username"></div>
                     <div class="form-group"><label for="password">Password</label><input class="form-control" type="password" name="password" id="password"></div>
-                    <button class="btn btn-primary btn-block" type="submit">Change admin password</button></form>
+                    <div class="form-group">
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="checkbox" disabled><label class="form-check-label" for="checkbox">Remember me (coming soon...)</label></div>
+                    </div><button class="btn btn-primary btn-block" type="submit">Log In</button></form>
             </div>
         </section>
     </main>
