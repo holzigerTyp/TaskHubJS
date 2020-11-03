@@ -210,7 +210,7 @@ function debugOutput() {
     var config = JSON.parse(rawdata);
     if(config.taskhubjs_debug_output == true) {
         app.use(function(req, res, next) {
-            if(!req.url.includes(".css") && !req.url.includes(".js") && !req.url.includes(".woff2") && !req.url.includes(".jpg") && !req.url.includes(".ico")) logCyan("GET -> "+ req.url + " -> " + req.ip)
+            if(!req.url.includes(".css") && !req.url.includes(".js") && !req.url.includes(".woff2") && !req.url.includes(".jpg") && !req.url.includes(".ico")) logCyan(req.method + " -> " + req.url + " -> " + req.ip)
             next()
         })
     }
