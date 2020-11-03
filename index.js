@@ -14,6 +14,7 @@ var version = undefined
 const moment        = require('moment');
 const taskHandler   = require('./taskhandler')
 const cookieparser  = require('cookie-parser')
+const cookiesession  = require('cookie-session')
 const jwt           = require('jsonwebtoken')
 const bcrypt        = require('bcrypt')
 const fs            = require('fs')
@@ -21,6 +22,7 @@ const express       = require("express")
 const app           = express()
 const mysql         = require("mysql")
 const chalk         = require("chalk")
+const csrf          = require("csurf")
 var connection      = undefined
 
 var protector           = []
@@ -322,8 +324,20 @@ debugOutput()
 app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(cookiesession({ secret: "g28tuqfGHS)$MGS)Zjiugjnw" }))
+app.use(csrf())
 app.use(cookieparser())
-app.set('view engine', 'hbs')
+app.use(function(err, req, res, next) {
+    if (err.code !== 'EBADCSRFTOKEN') return next(err)
+ 
+    res.status(403)
+    res.send('Session has expired or form tampered with')
+})
+app.use(function(req, res, next) {
+    res.locals.csrftoken = req.csrfToken()
+    next()
+})
+app.set('view engine', 'ejs')
 
 app.get("/", function(req, res) {
     res.render("index")
@@ -413,7 +427,7 @@ app.post("/api/auth", function(req, res) {
                             httpOnly: true
                         })
                         updateAuthentification(username, token)
-                        res.status(200).redirect("/dashboard")
+                        setTimeout(() => res.status(200).redirect("/dashboard"), general_cooldown)
                     } else res.redirect("/login")
                 })
             } else res.redirect("/login")
