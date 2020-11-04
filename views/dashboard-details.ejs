@@ -129,9 +129,9 @@
                     document.getElementById("sys-timestamp").innerText = "Created at " + time[0] + "." + time[1] + "." + time[2] + " " + time[3] + ":" + time[4] + ":" + time[5]
                     document.getElementById("sys-priority").innerHTML = 'Priority:&nbsp;<span class="badge badge-' + colPrio + '">' + prio + '</span>'
                     document.getElementById("sys-status").innerHTML = 'Status:&nbsp;<span class="badge badge-' + col + '">' + stat + '</span>'
-                    document.getElementById("sys-delete").href = '/api/deletetask/' + window.location.href.slice(-1) 
-                    document.getElementById("sys-stat").action = '/api/changestatus/' + window.location.href.slice(-1) 
-                    document.getElementById("sys-prio").action = '/api/changepriority/' + window.location.href.slice(-1) 
+                    document.getElementById("sys-delete").href = '/api/deletetask/' + window.location.href.split("/").pop() 
+                    document.getElementById("sys-stat").action = '/api/changestatus/' + window.location.href.split("/").pop()
+                    document.getElementById("sys-prio").action = '/api/changepriority/' + window.location.href.split("/").pop()
                 }
             }
         })
