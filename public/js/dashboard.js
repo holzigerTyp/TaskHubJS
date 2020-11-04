@@ -6,7 +6,7 @@ function initTasks() {
         dataType: "json",
         success: function(data) {
             if(data.length != 0) {
-                for (i = 0; i < data.length; i++) {
+                for (var i = 0; i < data.length; i++) {
                     var stat = "Error"
                     var col = ""
                     if(data[i].status == 0) {
@@ -69,7 +69,7 @@ function initTasksExceptFilter() {
         dataType: "json",
         success: function(data) {
             if(data.length != 0) {
-                for (i = 0; i < data.length; i++) {
+                for (var i = 0; i < data.length; i++) {
                     var stat = "Error"
                     var col = ""
                     if(data[i].status == 0) {
@@ -100,14 +100,14 @@ function initTasksExceptFilter() {
                         colPrio = "danger"
                     }
                     var doc = document.getElementById("overview")
-                    if(stat == "Open" && open.checked) insertTask(doc, stat, col, prio, colPrio, data)
-                    if(stat == "In progress" && inprog.checked) insertTask(doc, stat, col, prio, colPrio, data)
-                    if(stat == "Finished" && finished.checked) insertTask(doc, stat, col, prio, colPrio, data)
-                    if(stat == "Information" && info.checked) insertTask(doc, stat, col, prio, colPrio, data)
+                    if(stat == "Open" && open.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
+                    if(stat == "In progress" && inprog.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
+                    if(stat == "Finished" && finished.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
+                    if(stat == "Information" && info.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
 
-                    if(prio == "Low" && low.checked) insertTask(doc, stat, col, prio, colPrio, data)
-                    if(prio == "Normal" && normal.checked) insertTask(doc, stat, col, prio, colPrio, data)
-                    if(prio == "Urgent" && urgent.checked) insertTask(doc, stat, col, prio, colPrio, data)
+                    if(prio == "Low" && low.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
+                    if(prio == "Normal" && normal.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
+                    if(prio == "Urgent" && urgent.checked) insertTask(doc, stat, col, prio, colPrio, data, i)
                 }
                 if(document.getElementById("overview").innerHTML === "") {
                     insertErrorTask()
@@ -119,7 +119,7 @@ function initTasksExceptFilter() {
     });
 }
 
-function insertTask(doc, stat, col, prio, colPrio, data) {
+function insertTask(doc, stat, col, prio, colPrio, data, i) {
     doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4 sys-col" id="' + stat.toLowerCase() + '/' + prio.toLowerCase() + '"><div class="clean-product-item"><div class="image"><a href="#"></a></div><div class="product-name"><a href="/dashboard/' + data[i].ID + '">' + data[i].title + '</a></div><div class="about"><div class="rating"><span class="badge badge-' + col + '">' + stat + '</span></div><div class="price"><span class="badge badge-primary badge-' + colPrio + '">' + prio + '</span></div></div></div></div>'
 }
 function insertErrorTask() {
