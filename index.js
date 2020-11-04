@@ -190,9 +190,10 @@ function setupMySQLDatabase() {
     logSuc("MySQL table validation finished.")
 }
 function debugOutput() {
+    if(!fs.existsSync("config.json")) return
+
     var rawdata = fs.readFileSync('config.json');
     var config = JSON.parse(rawdata);
-
     if(config.taskhubjs_debug_output != true) return
 
     app.use(function(req, res, next) {
