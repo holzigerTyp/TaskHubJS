@@ -62,14 +62,13 @@ function logCyan(msg) {
 }
 
 function checkAuthentification(token, callback) {
-    if(token != undefined) {
-        connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
-            if (error) logErr(error)
-            else {
-                callback(results.length)
-            }
-          });
-    } else callback(0)
+    if(token == undefined) () => { callback(0); return; }
+    connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
+        if (error) logErr(error)
+        else {
+            callback(results.length)
+        }
+    });
 }
 function updateAuthentification(username, token) {
     var sql = "UPDATE `accounts` SET `authToken`=? WHERE `username`=?"
@@ -90,14 +89,13 @@ function removeAuthentification(currentToken) {
     })
 }
 function getUsername(token, callback) {
-    if(token != undefined) {
-        connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
-            if (error) logErr(error)
-            else {
-                callback(results[0].username)
-            }
-          });
-    }
+    if(token == undefined) () => { callback(undefined); return; }
+    connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
+        if (error) logErr(error)
+        else {
+            callback(results[0].username)
+        }
+        });
 }
 
 function isBlocked(ip) {
@@ -178,40 +176,41 @@ function setupMySQLDatabase() {
     connection.query("SHOW TABLES LIKE 'tasks';", function (error, results, fields) {
         if (error) logErr(error)
         else {
-            if(results.length != 1) {
-                var rawdata = fs.readFileSync('config.json');
-                var config = JSON.parse(rawdata);
-                connection.query('CREATE TABLE `' + config.mysql_database + '`.`tasks` ( `ID` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `description` TEXT NOT NULL , `assignment` VARCHAR(255) NOT NULL , `timestampCreated` VARCHAR(255) NOT NULL , `status` INT NOT NULL , `priority` INT NOT NULL , PRIMARY KEY (`ID`)) ENGINE = InnoDB;', function (error, results, fields) {
-                    if (error) logErr(error)
-                });
-            }
+            if(results.length == 1) return
+
+            var rawdata = fs.readFileSync('config.json');
+            var config = JSON.parse(rawdata);
+
+            connection.query('CREATE TABLE `' + config.mysql_database + '`.`tasks` ( `ID` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `description` TEXT NOT NULL , `assignment` VARCHAR(255) NOT NULL , `timestampCreated` VARCHAR(255) NOT NULL , `status` INT NOT NULL , `priority` INT NOT NULL , PRIMARY KEY (`ID`)) ENGINE = InnoDB;', function (error, results, fields) {
+                if (error) logErr(error)
+            });
         }
       });
 
     connection.query("SHOW TABLES LIKE 'accounts';", function (error, results, fields) {
         if (error) logErr(error)
         else {
-            if(results.length != 1) {
-                var rawdata = fs.readFileSync('config.json');
-                var config = JSON.parse(rawdata);
-                connection.query('CREATE TABLE `' + config.mysql_database + '`.`accounts` ( `UID` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(255) NOT NULL , `hashed` TEXT NOT NULL , `authToken` VARCHAR(255) NOT NULL , `timestampLastLogin` VARCHAR(255) NOT NULL , `rank` VARCHAR(255) NOT NULL , PRIMARY KEY (`UID`)) ENGINE = InnoDB;', function (error, results, fields) {
+            if(results.length == 1) return
+
+            var rawdata = fs.readFileSync('config.json');
+            var config = JSON.parse(rawdata);
+
+            connection.query('CREATE TABLE `' + config.mysql_database + '`.`accounts` ( `UID` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(255) NOT NULL , `hashed` TEXT NOT NULL , `authToken` VARCHAR(255) NOT NULL , `timestampLastLogin` VARCHAR(255) NOT NULL , `rank` VARCHAR(255) NOT NULL , PRIMARY KEY (`UID`)) ENGINE = InnoDB;', function (error, results, fields) {
+                if (error) logErr(error)
+                connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin")', function (error, results, fields) {
                     if (error) logErr(error)
-                    connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin")', function (error, results, fields) {
-                        if (error) logErr(error)
-                    });
                 });
-            }
+            });
         }
     });
 
     connection.query('SELECT * FROM `accounts` WHERE `username`="admin"', function (error, results, fields) {
-        if(results != undefined) {
-            if(results.length != 1) {
-                connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin")', function (error, results, fields) {
-                    if (error) logErr(error)
-                });
-            }
-        }
+        if(results == undefined) return
+        if(results.length == 1) return
+
+        connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin")', function (error, results, fields) {
+            if (error) logErr(error)
+        });
       });
 
     logSuc("MySQL table validation finished.")
@@ -219,18 +218,20 @@ function setupMySQLDatabase() {
 function debugOutput() {
     var rawdata = fs.readFileSync('config.json');
     var config = JSON.parse(rawdata);
-    if(config.taskhubjs_debug_output == true) {
-        app.use(function(req, res, next) {
-            if(!req.url.includes(".css") && !req.url.includes(".js") && !req.url.includes(".woff2") && !req.url.includes(".jpg") && !req.url.includes(".ico")) logCyan(req.method + " -> " + req.url + " -> " + req.ip)
-            next()
-        })
-    }
+
+    if(config.taskhubjs_debug_output != true) return
+
+    app.use(function(req, res, next) {
+        if(!req.url.includes(".css") && !req.url.includes(".js") && !req.url.includes(".woff2") && !req.url.includes(".jpg") && !req.url.includes(".ico")) logCyan(req.method + " -> " + req.url + " -> " + req.ip)
+        next()
+    })
 }
 
 // MySQL functions //
 function mysql_updatelogintimestamp(username) {
     var timestamp = moment().format('DD/MM/YYYY/HH/mm/ss')
     var sql = "UPDATE `accounts` SET `timestampLastLogin`=? WHERE `username`=?"
+
     connection.query(sql, [timestamp,username], function (error, results, fields) {
         if (error) {
             logErr(error)
@@ -288,16 +289,16 @@ function mysql_deletetask(id) {
     })
 }
 function mysql_getrank(token, callback) {
-    if(token != undefined) {
-        connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
-            if (error) {
-                logErr(error)
-                callback(0)
-            } else {
-                callback(results[0].rank)
-            }
-          });
-    } else callback(0)
+    if(token == undefined) () => { callback(0); return; }
+
+    connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
+        if (error) {
+            logErr(error)
+            callback(0)
+        } else {
+            callback(results[0].rank)
+        }
+    });
 }
 function mysql_deleteaccount(id) {
     var sql = "DELETE FROM `accounts` WHERE `UID`=?"
@@ -362,9 +363,8 @@ app.get("/", function(req, res) {
 })
 app.get("/login", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
-        if(result == 1) {
-            res.redirect("/dashboard")
-        } else res.render("login")
+        if(result == 1) res.redirect("/dashboard")
+        else res.render("login")
     }) 
     
 })
@@ -430,6 +430,7 @@ app.get("/createtask", function(req, res) {
 app.post("/api/auth", function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
+
     connection.query("SELECT * FROM `accounts` WHERE `username`=?", username, function (error, results, fields) {
         if (error) logErr(error)
         else {
@@ -456,6 +457,7 @@ app.post("/api/createtask", function(req, res) {
         if(result == 1) {
             var title = req.body.title
             var description = req.body.description
+
             getUsername(req.cookies.auth, (username) => {
                 taskHandler.createTask(connection, title, description, 1, username)
                 res.redirect("/dashboard")
@@ -514,6 +516,7 @@ app.post("/api/createaccount", function(req, res) {
                     var username = req.body.username
                     var password = req.body.password
                     var prev = req.body.prev
+
                     mysql_createaccount(username, password, prev)
                     res.redirect("/management")
                 } else res.render("error-rank")
@@ -539,6 +542,7 @@ app.post("/api/changeadminpassword", function(req, res) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") {
                     var password = req.body.password
+
                     mysql_changeadminpassword(password)
                     res.redirect("/management")
                 } else res.render("error-rank")
@@ -551,6 +555,7 @@ app.post("/api/changestatus/:id", function(req, res) {
         if(result == 1) {
             var status = req.body.status
             var id = req.params.id
+
             mysql_changestatus(id, status)
             res.redirect("/dashboard/" + id)
         } else res.redirect("/login")
@@ -561,6 +566,7 @@ app.post("/api/changepriority/:id", function(req, res) {
         if(result == 1) {
             var priority = req.body.priority
             var id = req.params.id
+
             mysql_changepriority(id, priority)
             res.redirect("/dashboard/" + id)
         } else res.redirect("/login")
