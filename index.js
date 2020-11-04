@@ -25,6 +25,11 @@ const chalk         = require("chalk")
 const csrf          = require("csurf")
 var connection      = undefined
 
+const ratelimit     = require("express-rate-limit")
+const limiter = ratelimit({
+    windowMs: 1 * 60 * 1000,
+    max: 140
+})
 
 let default_config = {
     mysql_hostname: "localhost",
@@ -303,6 +308,7 @@ debugOutput()
 app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(limiter)
 app.use(cookiesession({ secret: "g28tuqfGHS)$MGS)Zjiugjnw" }))
 
 // csurf //
