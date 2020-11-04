@@ -25,10 +25,6 @@ const chalk         = require("chalk")
 const csrf          = require("csurf")
 var connection      = undefined
 
-var protector           = []
-var protector_req       = []
-var protector_cooldown  = 1
-var protector_req_amo   = 4
 
 let default_config = {
     mysql_hostname: "localhost",
@@ -98,33 +94,6 @@ function getUsername(token, callback) {
         });
 }
 
-function isBlocked(ip) {
-    if(protector[ip] != undefined) {
-        if(protector_req[ip] != protector_req_amo) {
-            protector_req[ip] = protector_req[ip] + 1
-            return false
-        } else if(protector_req[ip] == protector_req_amo) {
-            var now = moment(new Date())
-            var end = moment(protector[ip])
-
-            var duration = moment.duration(now.diff(end))
-            var secs = duration.asSeconds()
-
-            if(secs > protector_cooldown) {
-                protector[ip] = moment()
-                protector_req[ip] = 1
-                return false
-            } else {
-                protector[ip] = moment()
-                return true
-            }
-        }
-    } else {
-        protector[ip] = moment()
-        protector_req[ip] = 1
-        return false
-    }
-}
 
 // Setup functions //
 function updateVersion() {
@@ -335,12 +304,6 @@ app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(cookiesession({ secret: "g28tuqfGHS)$MGS)Zjiugjnw" }))
-
-// Protector //
-app.use(function(req, res, next) {
-    if(isBlocked(req.ip)) res.sendStatus(429)
-    else next()
-})
 
 // csurf //
 app.use(csrf())
