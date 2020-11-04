@@ -36,7 +36,7 @@ Password: taskhubadmin
 
 
 ## Planed features
-- ❌ Sort tasks by status or priority
+- ✔️ Sort tasks by status or priority
 - ❌ Assign tasks to different users
 
 
