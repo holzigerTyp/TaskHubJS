@@ -62,7 +62,7 @@ function logCyan(msg) {
 }
 
 function checkAuthentification(token, callback) {
-    if(token == undefined) () => { callback(0); return; }
+    if(token == undefined) { callback(0); return; }
     connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
         if (error) logErr(error)
         else {
@@ -89,7 +89,7 @@ function removeAuthentification(currentToken) {
     })
 }
 function getUsername(token, callback) {
-    if(token == undefined) () => { callback(undefined); return; }
+    if(token == undefined) { callback(undefined); return; }
     connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
         if (error) logErr(error)
         else {
@@ -289,7 +289,7 @@ function mysql_deletetask(id) {
     })
 }
 function mysql_getrank(token, callback) {
-    if(token == undefined) () => { callback(0); return; }
+    if(token == undefined) { callback(0); return; }
 
     connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
         if (error) {
