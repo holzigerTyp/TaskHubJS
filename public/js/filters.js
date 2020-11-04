@@ -1,0 +1,4 @@
+function updateFilter() {
+    clearTaskList()
+    initTasksExceptFilter()
+}
