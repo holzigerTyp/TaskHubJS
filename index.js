@@ -25,7 +25,8 @@ const chalk         = require("chalk")
 const csrf          = require("csurf")
 var connection      = undefined
 
-const ratelimit     = require("express-rate-limit")
+const ratelimit     = require("express-rate-limit");
+const { config } = require('process');
 const limiter = ratelimit({
     windowMs: 1 * 60 * 1000,
     max: 140
@@ -37,7 +38,8 @@ let default_config = {
     mysql_username: "",
     mysql_password: "",
     mysql_database: "taskhubjs",
-    taskhubjs_debug_output: false
+    taskhubjs_debug_output: false,
+    taskhubjs_secret: "g28tuqfGHS)$MGS)Zjiugjnw"
 }
 
 
@@ -109,7 +111,7 @@ function setup() {
     if(fs.existsSync("config.json")) {
         var rawdata = fs.readFileSync('config.json');
         var config = JSON.parse(rawdata);
-        if(!config.mysql_hostname || !config.mysql_port || !config.mysql_username || !config.mysql_password || !config.mysql_database) {
+        if(!config.mysql_hostname || !config.mysql_port || !config.mysql_username || !config.mysql_password || !config.mysql_database || !config.taskhubjs_secret) {
             console.log("Welcome to to TaskHubJS. A new and easy way to organize your tasks with NodeJS. ")
             console.log("")
             console.log("It looks like your credentials for the MySQL database are not filled in right now. \nPlease take a look at config.json and fill in your credentials.")
@@ -310,7 +312,7 @@ app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(limiter)
-app.use(cookiesession({ secret: "g28tuqfGHS)$MGS)Zjiugjnw" }))
+app.use(cookiesession({ secret: config.taskhubjs_secret }))
 
 // csurf //
 app.use(csrf())
