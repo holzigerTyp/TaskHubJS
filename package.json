@@ -1,6 +1,6 @@
 {
   "name": "taskhubjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A new and easy way to organize your tasks with NodeJS",
   "main": "index.js",
   "scripts": {
