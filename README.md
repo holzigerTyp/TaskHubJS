@@ -4,8 +4,6 @@
 <img alt="undefined" src="https://badgen.net/github/license/holzigertyp/taskhubjs" />  <img alt="undefined" src="https://badgen.net/github/watchers/holzigertyp/taskhubjs" />  <img alt="undefined" src="https://badgen.net/github/commits/holzigertyp/taskhubjs" />
 </p></br>
 
-A new and easy way to organize your tasks with NodeJS
-
 TaskHubJS is a nodeJS based task organizer that is right in your browser.
 With the beautiful possibilities of expressJS and other npm packages it is possible to create a task organizer for your needs.
 
