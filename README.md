@@ -35,7 +35,9 @@ Password: taskhubadmin
 
 ## Planed features
 - ✔️ Sort tasks by status or priority
+- ✔️ Edit tasks
 - ❌ Assign tasks to different users
+- ❌ Redesign
 
 
 ## Used npm packages
