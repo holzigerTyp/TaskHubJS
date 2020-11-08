@@ -12,3 +12,10 @@ module.exports.createTask = function(connection, title, description, priority, u
         if (error) logErr(error)
     });
 }
+
+module.exports.updateTask = function(connection, id, title, description) {
+    var set = {title: title, description: description}
+    connection.query("UPDATE `tasks` SET ? WHERE `ID`=?", [set, id], function (error, results, fields) {
+        if (error) logErr(error)
+    });
+}
