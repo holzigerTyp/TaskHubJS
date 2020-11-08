@@ -400,6 +400,13 @@ app.get("/createtask", function(req, res) {
     }) 
 })
 
+app.get("/updatetask/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) res.render("update-task")
+        else res.redirect("/login")
+    }) 
+})
+
 app.post("/api/auth", function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
@@ -433,8 +440,20 @@ app.post("/api/createtask", function(req, res) {
 
             getUsername(req.cookies.auth, (username) => {
                 taskHandler.createTask(connection, title, description, 1, username)
-                res.redirect("/dashboard")
+                res.redirect("/dashboard/")
             })
+        } else res.redirect("/login")
+    })  
+})
+app.post("/api/updatetask/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            var title = req.body.title
+            var description = req.body.description
+            var id = req.params.id
+
+            taskHandler.updateTask(connection, id, title, description)
+            res.redirect("/dashboard/" + id)
         } else res.redirect("/login")
     })  
 })
