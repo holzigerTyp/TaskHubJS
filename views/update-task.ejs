@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>TaskHubJS</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
+    <link rel="stylesheet" href="/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
+    <link rel="stylesheet" href="/css/styles.min.css">
+</head>
+
+<body style="background: rgb(246,246,246);">
+    <nav class="navbar navbar-light navbar-expand-lg fixed-top bg-white clean-navbar">
+        <div class="container"><a class="navbar-brand logo" href="#">TaskHubJS</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse"
+                id="navcol-1">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/management">Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="page login-page">
+        <section class="clean-block clean-form dark">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Update task</h2>
+                </div>
+                <form id="sys-form" method="post">
+                    <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
+                    <div class="form-group"><label for="name">Title</label><input class="form-control item" type="text" name="title" id="title"></div>
+                    <div class="form-group"><label for="description">Description</label><textarea class="form-control" name="description" id="description" style="height: 500px; min-height: 500px; max-height: 500px;"></textarea></div>
+                    <div class="form-group"></div>
+                    <button class="btn btn-primary btn-block" type="submit">Update task</button></form>
+            </div>
+        </section>
+    </main>
+    <footer class="page-footer dark" style="padding: 0px;">
+        <div class="footer-copyright">
+            <p>Created by holzigerTyp with&nbsp;💙 and Bootstrap Studio Template<br></p>
+        </div>
+    </footer>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
+    <script src="/js/script.min.js"></script>
+    <script>
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:4000/api/gettaskdetail/" + window.location.href.split("/").pop(),
+            crossDomain: false,
+            dataType: "json",
+            success: function(data) {
+                var title = document.getElementById("title")
+                var desc = document.getElementById("description")
+
+                title.value = data[0].title
+                desc.value = data[0].description
+
+                document.getElementById("sys-form").action = "/api/updatetask/" + window.location.href.split("/").pop()
+            }
+        })
+    </script>
+</body>
+
+</html>
