@@ -42,7 +42,8 @@
                             </div>
                             <div class="price">
                                 <h3 id="sys-priority"></h3>
-                                <h3 id="sys-status"></h3>
+                                <h3 id="sys-status"></h3></br>
+                                <h3 id="sys-assignment"></h3>
                             </div>
                             <div class="summary"></div>
                         </div>
@@ -60,10 +61,13 @@
                                 </div>
                                 <div class="tab-pane fade show specifications" role="tabpanel" id="specifications">
                                     <div class="row" style="margin-bottom: 20px;">
-                                        <div class="col"><form method="post" id="sys-prio"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><select style="width:200px" id="priority" name="priority"><option value="0">Low priority</option><option value="1">Normal priority</option><option value="2">Urgent priority</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change priority</button></form></div>
+                                        <div class="col"><form class="form-inline" method="post" id="sys-prio"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><select class="form-control" style="width:200px" id="priority" name="priority"><option value="0">Low priority</option><option value="1">Normal priority</option><option value="2">Urgent priority</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change priority</button></form></div>
                                     </div>
                                     <div class="row" style="margin-bottom: 20px;">
-                                        <div class="col"><form method="post" id="sys-stat"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><select style="width:200px" id="status" name="status"><option value="0" selected="">Open</option><option value="1">In progress</option><option value="2">Finished</option><option value="3">Information</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change status</button></form></div>
+                                        <div class="col"><form class="form-inline" method="post" id="sys-stat"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><select class="form-control" style="width:200px" id="status" name="status"><option value="0" selected="">Open</option><option value="1">In progress</option><option value="2">Finished</option><option value="3">Information</option></select><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-pencil"></i>Change status</button></form></div>
+                                    </div>
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col"><form class="form-inline" method="post" id="sys-assign"><input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>"><input class="form-control" type="text" name="username" id="username" placeholder="Username to assign" style="width:200px"><button type="submit" class="btn btn-primary" style="margin-left: 20px;"><i class="fa fa-user"></i>Change assign</button></form></div>
                                     </div>
                                     <div class="row" style="margin-top: 50px;">
                                         <div class="col"><a class="btn btn-danger" id="sys-delete"><i class="fa fa-trash"></i>Remove task</a><a class="btn btn-warning" id="sys-edit" style="margin-left: 50px"><i class="fa fa-refresh"></i>Edit / update task</a></div>
@@ -86,9 +90,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
     <script src="/js/script.min.js"></script>
     <script>
+
         $.ajax({
             type: "GET",
-            url: "http://localhost:4000/api/gettaskdetail/" + window.location.href.split("/").pop(),
+            url: window.location.protocol + '//' + window.location.host + "/api/gettaskdetail/" + window.location.href.split("/").pop(),
             crossDomain: false,
             dataType: "json",
             success: function(data) {
@@ -129,10 +134,12 @@
                     document.getElementById("sys-timestamp").innerText = "Created at " + time[0] + "." + time[1] + "." + time[2] + " " + time[3] + ":" + time[4] + ":" + time[5]
                     document.getElementById("sys-priority").innerHTML = 'Priority:&nbsp;<span class="badge badge-' + colPrio + '">' + prio + '</span>'
                     document.getElementById("sys-status").innerHTML = 'Status:&nbsp;<span class="badge badge-' + col + '">' + stat + '</span>'
+                    document.getElementById("sys-assignment").innerHTML = 'Assigned to:&nbsp;<span class="badge badge-secondary">' + data[i].assignment + '</span>'
                     document.getElementById("sys-delete").href = '/api/deletetask/' + window.location.href.split("/").pop() 
                     document.getElementById("sys-edit").href = '/updatetask/' + window.location.href.split("/").pop() 
                     document.getElementById("sys-stat").action = '/api/changestatus/' + window.location.href.split("/").pop()
                     document.getElementById("sys-prio").action = '/api/changepriority/' + window.location.href.split("/").pop()
+                    document.getElementById("sys-assign").action = '/api/changeassign/' + window.location.href.split("/").pop()
                 }
             }
         })
