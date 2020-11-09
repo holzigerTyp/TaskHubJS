@@ -36,7 +36,9 @@ Password: taskhubadmin
 ## Planed features
 - ✔️ Sort tasks by status or priority
 - ✔️ Edit tasks
-- ❌ Assign tasks to different users
+- ✔️ Assign tasks to different users
+- ❌ Search bar in dashboard
+- ❌ Time documentation
 - ❌ Redesign
 
 
