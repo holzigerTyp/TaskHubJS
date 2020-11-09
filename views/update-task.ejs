@@ -52,7 +52,7 @@
     <script>
         $.ajax({
             type: "GET",
-            url: "http://localhost:4000/api/gettaskdetail/" + window.location.href.split("/").pop(),
+            url: window.location.protocol + '//' + window.location.host + "/api/gettaskdetail/" + window.location.href.split("/").pop(),
             crossDomain: false,
             dataType: "json",
             success: function(data) {

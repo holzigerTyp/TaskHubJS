@@ -1,7 +1,7 @@
 function initTasks() {
     $.ajax({
         type: "GET",
-        url: "http://localhost:4000/api/gettasks",
+        url: window.location.protocol + '//' + window.location.host + "/api/gettasks",
         crossDomain: false,
         dataType: "json",
         success: function(data) {
@@ -36,8 +36,9 @@ function initTasks() {
                         prio = "Urgent"
                         colPrio = "danger"
                     }
+
                     var doc = document.getElementById("overview")
-                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4 sys-col" id="' + stat.toLowerCase() + '/' + prio.toLowerCase() + '"><div class="clean-product-item"><div class="image"><a href="#"></a></div><div class="product-name"><a href="/dashboard/' + data[i].ID + '">' + data[i].title + '</a></div><div class="about"><div class="rating"><span class="badge badge-' + col + '">' + stat + '</span></div><div class="price"><span class="badge badge-primary badge-' + colPrio + '">' + prio + '</span></div></div></div></div>'
+                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4 sys-col" id="' + stat.toLowerCase() + '/' + prio.toLowerCase() + '"><div class="clean-product-item"><div class="image"><a href="#"></a></div><div class="product-name"><a href="/dashboard/' + data[i].ID + '">' + data[i].title + '</a></div><div class="about"><div class="rating"><span class="badge badge-' + col + '">' + stat + '</span></br><span class="badge badge-secondary">' + data[i].assignment + '</span></div><div class="price"><span class="badge badge-primary badge-' + colPrio + '">' + prio + '</span><p></br></p></div></div></div></div>'
                 }
             } else {
                 var doc = document.getElementById("overview")
@@ -64,7 +65,7 @@ function initTasksExceptFilter() {
 
     $.ajax({
         type: "GET",
-        url: "http://localhost:4000/api/gettasks",
+        url: window.location.protocol + '//' + window.location.host + "/api/gettasks",
         crossDomain: false,
         dataType: "json",
         success: function(data) {

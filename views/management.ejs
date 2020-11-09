@@ -79,7 +79,7 @@
     <script>
         $.ajax({
             type: "GET",
-            url: "http://localhost:4000/api/getaccounts",
+            url: window.location.protocol + '//' + window.location.host + "/api/getaccounts",
             crossDomain: false,
             dataType: "json",
             success: function(data) {
