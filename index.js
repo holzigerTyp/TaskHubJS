@@ -278,6 +278,19 @@ function mysql_getrank(token, callback) {
         }
     });
 }
+function mysql_getusernamebyid(id, callback) {
+    if(id == undefined) { callback(0); return; }
+
+    connection.query("SELECT * FROM `accounts` WHERE `UID`=?", id, function (error, results, fields) {
+        if (error) {
+            logErr(error)
+            callback(0)
+        } else {
+            if(results[0] == undefined) callback(0)
+            else callback(results[0].username)
+        }
+    });
+}
 function mysql_deleteaccount(id) {
     var sql = "DELETE FROM `accounts` WHERE `UID`=?"
     connection.query(sql, id, function (error, results, fields) {
@@ -304,6 +317,28 @@ function mysql_changepriority(taskid, priority) {
             return false
         } else return true
     })
+}
+function mysql_changeassign(taskid, username) {
+    var sql = "UPDATE `tasks` SET `assignment`=? WHERE `ID`=?"
+    connection.query(sql, [username,taskid], function (error, results, fields) {
+        if (error) {
+            logErr(error)
+            return false
+        } else return true
+    })
+}
+function mysql_usernameexists(username, callback) {
+    if(username == undefined) { callback(false); return; }
+
+    connection.query("SELECT * FROM `accounts` WHERE `username`=?", username, function (error, results, fields) {
+        if (error) {
+            logErr(error)
+            callback(false)
+        } else {
+            if(results[0] == undefined) callback(false)
+            else callback(true)
+        }
+    });
 }
 
 // Express //
@@ -485,6 +520,16 @@ app.get("/api/gettaskdetail/:id", function(req, res) {
         } else res.redirect("/login")
     })  
 })
+app.get("/api/getusername/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            mysql_getusernamebyid(req.params.id, (list) => {
+                res.setHeader("Content-Type", "application/json")
+                res.status(200).send(list + "")
+            })
+        } else res.redirect("/login")
+    })  
+})
 app.get("/api/getaccounts", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
@@ -561,6 +606,21 @@ app.post("/api/changepriority/:id", function(req, res) {
 
             mysql_changepriority(id, priority)
             res.redirect("/dashboard/" + id)
+        } else res.redirect("/login")
+    })  
+})
+
+app.post("/api/changeassign/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            var username = req.body.username
+            mysql_usernameexists(username, (out) => {
+                var id = req.params.id
+                if(out == true) {
+                    mysql_changeassign(id, username)
+                    res.redirect("/dashboard/" + id)
+                } else res.redirect("/dashboard/" + id)
+            })
         } else res.redirect("/login")
     })  
 })
