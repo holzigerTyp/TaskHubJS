@@ -594,7 +594,7 @@ app.post("/api/changestatus/:id", function(req, res) {
             var id = req.params.id
 
             mysql_changestatus(id, status)
-            res.redirect("/dashboard/" + id)
+            res.redirect("/dashboard/" + id + "#settings")
         } else res.redirect("/login")
     })  
 })
@@ -605,7 +605,7 @@ app.post("/api/changepriority/:id", function(req, res) {
             var id = req.params.id
 
             mysql_changepriority(id, priority)
-            res.redirect("/dashboard/" + id)
+            res.redirect("/dashboard/" + id + "#settings")
         } else res.redirect("/login")
     })  
 })
@@ -618,8 +618,8 @@ app.post("/api/changeassign/:id", function(req, res) {
                 var id = req.params.id
                 if(out == true) {
                     mysql_changeassign(id, username)
-                    res.redirect("/dashboard/" + id)
-                } else res.redirect("/dashboard/" + id)
+                    res.redirect("/dashboard/" + id + "#settings")
+                } else res.redirect("/dashboard/" + id + "#settings")
             })
         } else res.redirect("/login")
     })  
