@@ -37,7 +37,7 @@ Password: taskhubadmin
 - ✔️ Sort tasks by status or priority
 - ✔️ Edit tasks
 - ✔️ Assign tasks to different users
-- ❌ Search bar in dashboard
+- ✔️ Search bar in dashboard
 - ❌ Time documentation
 - ❌ Redesign
 
