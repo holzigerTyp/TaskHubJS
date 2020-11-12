@@ -37,6 +37,12 @@
                         <div class="col-md-3">
                             <div class="d-none d-md-block">
                                 <div class="filters">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Search by title" id="search">
+                                        <div class="input-group-append">
+                                          <button class="btn btn-info" type="button" id="searchBtn" onclick="updateSearch()" style="margin-bottom: 30px;"><i class="fa fa-search"></i></button>
+                                        </div>
+                                    </div>
                                     <a class="btn btn-success" href="/createtask" style="margin-bottom: 10px"><i class="fa fa-pencil"></i>Create new task</a>
                                     <a class="btn btn-info" href="/dashboard" style="margin-bottom: 60px"><i class="fa fa-refresh"></i>Refresh filter</a>
                                     <div class="filter-item">
@@ -85,6 +91,7 @@
     <script src="/js/script.min.js"></script>
     <script src="/js/dashboard.js"></script>
     <script src="/js/filters.js"></script>
+    <script src="/js/search.js"></script>
 </body>
 
 </html>
