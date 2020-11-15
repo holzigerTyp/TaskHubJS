@@ -38,11 +38,11 @@ function initTasks() {
                     }
 
                     var doc = document.getElementById("overview")
-                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4 sys-col" id="' + stat.toLowerCase() + '/' + prio.toLowerCase() + '"><div class="clean-product-item"><div class="image"><a href="#"></a></div><div class="product-name"><a href="/dashboard/' + data[i].ID + '">' + data[i].title + '</a></div><div class="about"><div class="rating"><span class="badge badge-' + col + '">' + stat + '</span></br><span class="badge badge-secondary">' + data[i].assignment + '</span></div><div class="price"><span class="badge badge-primary badge-' + colPrio + '">' + prio + '</span><p></br></p></div></div></div></div>'
+                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4 sys-col" id="' + stat.toLowerCase() + '/' + prio.toLowerCase() + '"><div class="clean-product-item" style="border: 0px;"><div class="image"><a href="#"></a></div><div class="product-name"><a href="/dashboard/' + data[i].ID + '">' + data[i].title + '</a></div><div class="about"><div class="rating"><span class="badge badge-' + col + '">' + stat + '</span></br><span class="badge badge-secondary">' + data[i].assignment + '</span></div><div class="price"><span class="badge badge-primary badge-' + colPrio + '">' + prio + '</span><p></br></p></div></div></div></div>'
                 }
             } else {
                 var doc = document.getElementById("overview")
-                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"><div class="image"><a href="#"></a></div><div class="product-name"><a>No tasks found.</a></div><div class="about"></div></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"></div></div>'
+                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item" style="border: 0px;"><div class="image"><a href="#"></a></div><div class="product-name"><a>No tasks found.</a></div><div class="about"></div></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"></div></div>'
             }
         }
     });
