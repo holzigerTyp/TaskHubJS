@@ -12,7 +12,7 @@ I am right at the starting point of the project so it is possible that some bugs
 I try to give my best to bring this project always on so stay tuned for the first release of this project.
 
 
-## Get started
+## ☕ Get started
 To get started download the files and cd into the directory.
 
 1. Install required packages
@@ -33,20 +33,20 @@ Password: taskhubadmin
 6. Enjoy using TaskHubJS :)
 
 
-## Planed features
-- ✔️ Sort tasks by status or priority
-- ✔️ Edit tasks
-- ✔️ Assign tasks to different users
-- ✔️ Search bar in dashboard
-- ❌ Time documentation
-- ❌ Redesign
+## 🕑 Planed features
+- [x] Sort tasks by status or priority
+- [x] Edit tasks
+- [x] Assign tasks to different users
+- [x] Search bar in dashboard
+- [ ] Time documentation
+- [ ] Redesign
 
 
-## Used npm packages
+## 📦 Used npm packages
 Please take a look at the package.json to get more informations about the used npm packages.
 Every used package is licensed under MIT license except
 - ejs (https://www.npmjs.com/package/ejs | http://www.apache.org/licenses/LICENSE-2.0)
 
 
-## License
+## 📜 License
 GNU General Public License v3.0
