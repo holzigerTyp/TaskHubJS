@@ -42,7 +42,7 @@ function initTasks() {
                 }
             } else {
                 var doc = document.getElementById("overview")
-                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item" style="border: 0px;"><div class="image"><a href="#"></a></div><div class="product-name"><a>No tasks found.</a></div><div class="about"></div></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item"></div></div>'
+                    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item" style="border: 0px;"></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item" style="border: 0px;"><div class="image"><a href="#"></a></div><div class="product-name"><a>No tasks found.</a></div><div class="about"></div></div></div><div class="col-12 col-md-6 col-lg-4"><div class="clean-product-item" style="border: 0px;"></div></div>'
             }
         }
     });
