@@ -27,6 +27,8 @@ var connection      = undefined
 
 const ratelimit     = require("express-rate-limit");
 const { config } = require('process');
+const { start } = require('repl');
+const { parseTwoDigitYear } = require('moment');
 const limiter = ratelimit({
     windowMs: 1 * 60 * 1000,
     max: 140
@@ -101,6 +103,151 @@ function getUsername(token, callback) {
         }
         });
 }
+function getUserID(token, callback) {
+    if(token == undefined) { callback(undefined); return; }
+    connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
+        if (error) logErr(error)
+        else {
+            callback(results[0].UID)
+        }
+        });
+}
+
+// Time documentation functions //
+function startLogging(taskid, uid) {
+    getActiveLogging(taskid, function(out) {
+        var ar = JSON.parse(out)
+        if(!ar.includes(uid)) {
+            ar.push(uid)
+            var json = JSON.stringify(ar)
+            var sql = "UPDATE `tasks` SET `timeDocumentationActive`=? WHERE `ID`=?"
+            connection.query(sql, [json,taskid], function (error, results, fields) {
+                if (error) {
+                    logErr(error)
+                    return false
+                } else return true
+            })
+        }
+        
+    })
+}
+function stopLogging(taskid, uid) {
+    getActiveLogging(taskid, function(out) {
+        var ar = JSON.parse(out)
+        if(ar.includes(uid)) {
+            var ind = ar.indexOf(uid);
+            if (ind > -1) {
+                ar.splice(ind, 1);
+            }
+            var json = JSON.stringify(ar)
+            var sql = "UPDATE `tasks` SET `timeDocumentationActive`=? WHERE `ID`=?"
+            connection.query(sql, [json,taskid], function (error, results, fields) {
+                if (error) {
+                    logErr(error)
+                    return false
+                } else return true
+            })
+        }
+        
+    })
+}
+function getActiveLogging(taskid, callback) {
+    connection.query("SELECT `timeDocumentationActive` FROM `tasks` WHERE `ID`=?", taskid, function (error, results, fields) {
+        if (error) logErr(error)
+        else {
+            callback(results[0].timeDocumentationActive)
+        }
+    });
+}
+function getLogging(taskid, callback) {
+    connection.query("SELECT `timeDocumentation` FROM `tasks` WHERE `ID`=?", taskid, function (error, results, fields) {
+        if (error) logErr(error)
+        else {
+            callback(results[0].timeDocumentation)
+        }
+    });
+}
+var loggingArray;
+var loggingIndex;
+function getLoggingWithIDs(taskid, callback) {
+    connection.query("SELECT `timeDocumentation` FROM `tasks` WHERE `ID`=?", taskid, function (error, results, fields) {
+        if (error) logErr(error)
+        else {
+            if(results[0].timeDocumentation == "") {
+                callback([])
+            } else {
+                loggingArray = JSON.parse(results[0].timeDocumentation)
+            
+                for(var i = 0; i < loggingArray.length; i++) {
+                    var uid = parseInt(loggingArray[i][0].replace("uid", ""))
+                    loggingArray[i][0] = uid
+                }
+
+                getLoggingUsernames()
+                setTimeout(() => callback(loggingArray), 400)
+            }
+        }
+    });
+}
+function getLoggingUsernames() {
+    for(var i = 0; i < loggingArray.length; i++) {
+        (function(i) {
+            setTimeout(function() {
+                loggingIndex = i
+                mysql_getusernamebyid(loggingArray[i][0], (out) => {
+                    setLoggingUsername(out)
+                })
+            }, i * 200)
+        }(i))
+    }
+}
+function setLoggingUsername(username) {
+    loggingArray[loggingIndex][0] = username
+}
+function addSecondToLogging(taskid, uid) {
+    getLogging(taskid, function(out) {
+        var map = undefined
+        if(out == "") {
+            map = new Map()
+            map.set("uid" + uid, 2)
+        } else {
+            map = new Map(JSON.parse(out))
+            if(map.get("uid" + uid) == undefined) {
+                map.set("uid" + uid, 2)
+            } else {
+                var currentSecs = parseInt(map.get("uid" + uid).toString())
+                map.set("uid" + uid, currentSecs+2)
+            }
+        }
+        var maparray = JSON.stringify(Array.from(map))
+        var sql = "UPDATE `tasks` SET `timeDocumentation`=? WHERE `ID`=?"
+        connection.query(sql, [maparray, taskid], function (error, results, fields) {
+            if (error) {
+                logErr(error)
+                return false
+            } else return true
+        })
+    })
+}
+function updateLogging() {
+    mysql_gettasks(function(res) {
+        for(var i = 0; i < res.length; i++) {
+            var taskid = res[i].ID
+            getActiveLogging(taskid, function(out) {
+                var ar = JSON.parse(out)
+                for(var i1 = 0; i1 < ar.length; i1++) {
+                    (function(i1) {
+                        setTimeout(function() {
+                            var uid = ar[i1]
+                            addSecondToLogging(taskid, uid)
+                        }, i1 * 500)
+                    }(i1))
+                }
+                
+            })
+        }
+    })
+}
 
 
 // Setup functions //
@@ -146,6 +293,7 @@ function setupMySQLConnection() {
 
         app.listen(port, function() {
             logSuc("Webserver started successful. View webpage at http://localhost:" + port)
+            setInterval(() => updateLogging(), 2000)
         })
     });
 }
@@ -158,7 +306,7 @@ function setupMySQLDatabase() {
             var rawdata = fs.readFileSync('config.json');
             var config = JSON.parse(rawdata);
 
-            connection.query('CREATE TABLE `' + config.mysql_database + '`.`tasks` ( `ID` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `description` TEXT NOT NULL , `assignment` VARCHAR(255) NOT NULL , `timestampCreated` VARCHAR(255) NOT NULL , `status` INT NOT NULL , `priority` INT NOT NULL , PRIMARY KEY (`ID`)) ENGINE = InnoDB;', function (error, results, fields) {
+            connection.query('CREATE TABLE `' + config.mysql_database + '`.`tasks` ( `ID` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(255) NOT NULL , `description` TEXT NOT NULL , `assignment` VARCHAR(255) NOT NULL , `timestampCreated` VARCHAR(255) NOT NULL , `status` INT NOT NULL , `priority` INT NOT NULL , `timeDocumentation` VARCHAR(255) NOT NULL , `timeDocumentationActive` VARCHAR(255) NOT NULL , PRIMARY KEY (`ID`)) ENGINE = InnoDB;', function (error, results, fields) {
                 if (error) logErr(error)
             });
         }
@@ -609,7 +757,6 @@ app.post("/api/changepriority/:id", function(req, res) {
         } else res.redirect("/login")
     })  
 })
-
 app.post("/api/changeassign/:id", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
@@ -620,6 +767,37 @@ app.post("/api/changeassign/:id", function(req, res) {
                     mysql_changeassign(id, username)
                     res.redirect("/dashboard/" + id + "#settings")
                 } else res.redirect("/dashboard/" + id + "#settings")
+            })
+        } else res.redirect("/login")
+    })  
+})
+
+app.get("/api/getlogging/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            getLoggingWithIDs(req.params.id, function(out) {
+                res.setHeader("Content-Type", "application/json")
+                res.status(200).send(out)
+            })
+        } else res.redirect("/login")
+    })  
+})
+app.get("/api/startlogging/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            getUserID(req.cookies.auth, function(uid) {
+                startLogging(req.params.id, uid)
+                res.redirect("/dashboard/" + req.params.id + "#time")
+            })
+        } else res.redirect("/login")
+    })  
+})
+app.get("/api/stoplogging/:id", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            getUserID(req.cookies.auth, function(uid) {
+                stopLogging(req.params.id, uid)
+                res.redirect("/dashboard/" + req.params.id + "#time")
             })
         } else res.redirect("/login")
     })  
