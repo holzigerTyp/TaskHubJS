@@ -7,7 +7,7 @@ function logErr(msg) {
 
 module.exports.createTask = function(connection, title, description, priority, username) {
     var timestamp = moment().format('DD/MM/YYYY/HH/mm/ss')
-    var set = {title: title, description: description, assignment: username, timestampCreated: timestamp, status: 0, priority: priority}
+    var set = {title: title, description: description, assignment: username, timestampCreated: timestamp, status: 0, priority: priority, timeDocumentation: "", timeDocumentationActive: "[]"}
     connection.query("INSERT INTO `tasks` SET ?", set, function (error, results, fields) {
         if (error) logErr(error)
     });
