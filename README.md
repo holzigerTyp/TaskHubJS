@@ -38,7 +38,7 @@ Password: taskhubadmin
 - [x] Edit tasks
 - [x] Assign tasks to different users
 - [x] Search bar in dashboard
-- [ ] Time documentation
+- [x] Time documentation
 - [ ] Redesign
 
 
