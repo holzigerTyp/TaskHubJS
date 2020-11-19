@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
     <link rel="stylesheet" href="/css/styles.min.css">
+    <link rel="stylesheet" href="/css/thjs.css">
 </head>
 
 <body style="background: rgb(246,246,246);">
@@ -31,7 +32,7 @@
                 <div class="block-heading">
                     <h2 class="text-info">Create new account</h2>
                 </div>
-                <form action="/api/createaccount" method="post">
+                <form action="/api/createaccount" method="post" class="thjs-round">
                     <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
                     <div class="form-group"><label for="username">Username</label><input class="form-control item" type="text" name="username" id="username"></div>
                     <div class="form-group"><label for="password">Password</label><input class="form-control" type="password" name="password" id="password"></div>
