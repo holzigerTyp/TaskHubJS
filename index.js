@@ -601,6 +601,8 @@ app.post("/api/auth", function(req, res) {
                     if(result == true) {
                         mysql_updatelogintimestamp(username)
                         var id = results[0].ID
+                        var rawdata = fs.readFileSync('config.json');
+                        var config = JSON.parse(rawdata);
                         var token = jwt.sign({id}, config.taskhubjs_sign_for_token, {expiresIn: "90d"})
                         res.cookie('auth', token, {
                             expires: new Date(Date.now() + (90 * 24 * 60 * 60 * 1000)), 
