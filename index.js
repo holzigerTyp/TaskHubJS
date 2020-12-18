@@ -40,7 +40,8 @@ let default_config = {
     mysql_database: "taskhubjs",
     taskhubjs_debug_output: false,
     taskhubjs_secret: "hWS023nf83guu8GS93",
-    taskhubjs_keys: "9iu2t98nsiuHSO289"
+    taskhubjs_keys: "9iu2t98nsiuHSO289",
+    taskhubjs_sign_for_token: "TASKHUBJS_BY_HOLZIGERTYP"
 }
 
 
@@ -257,7 +258,7 @@ function setup() {
     if(fs.existsSync("config.json")) {
         var rawdata = fs.readFileSync('config.json');
         var config = JSON.parse(rawdata);
-        if(!config.mysql_hostname || !config.mysql_port || !config.mysql_username || !config.mysql_password || !config.mysql_database || !config.taskhubjs_secret || !config.taskhubjs_keys) {
+        if(!config.mysql_hostname || !config.mysql_port || !config.mysql_username || !config.mysql_password || !config.mysql_database || !config.taskhubjs_secret || !config.taskhubjs_keys || !config.taskhubjs_sign_for_token) {
             console.log("Welcome to to TaskHubJS. A new and easy way to organize your tasks with NodeJS. ")
             console.log("")
             console.log("It looks like your credentials for the MySQL database are not filled in right now. \nPlease take a look at config.json and fill in your credentials.")
@@ -600,7 +601,7 @@ app.post("/api/auth", function(req, res) {
                     if(result == true) {
                         mysql_updatelogintimestamp(username)
                         var id = results[0].ID
-                        var token = jwt.sign({id}, "TASKHUBJS_BY_HOLZIGERTYP", {expiresIn: "90d"})
+                        var token = jwt.sign({id}, config.taskhubjs_sign_for_token, {expiresIn: "90d"})
                         res.cookie('auth', token, {
                             expires: new Date(Date.now() + (90 * 24 * 60 * 60 * 1000)), 
                             httpOnly: true
