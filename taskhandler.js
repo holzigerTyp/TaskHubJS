@@ -13,8 +13,8 @@ module.exports.createTask = function(connection, title, description, priority, u
     });
 }
 
-module.exports.updateTask = function(connection, id, title, description) {
-    var set = {title: title, description: description}
+module.exports.updateTask = function(connection, id, title, description, status, priority) {
+    var set = {title: title, description: description, status: status, priority: priority}
     connection.query("UPDATE `tasks` SET ? WHERE `ID`=?", [set, id], function (error, results, fields) {
         if (error) logErr(error)
     });
