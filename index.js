@@ -23,6 +23,7 @@ const app           = express()
 const mysql         = require("mysql")
 const chalk         = require("chalk")
 const csrf          = require("csurf")
+const https			= require("https")
 var connection      = undefined
 
 const ratelimit     = require("express-rate-limit");
@@ -39,6 +40,7 @@ let default_config = {
     mysql_password: "",
     mysql_database: "taskhubjs",
     taskhubjs_debug_output: false,
+    taskhubjs_check_for_updates: true,
     taskhubjs_secret: "hWS023nf83guu8GS93",
     taskhubjs_keys: "9iu2t98nsiuHSO289",
     taskhubjs_sign_for_token: "TASKHUBJS_BY_HOLZIGERTYP"
@@ -65,6 +67,7 @@ function logSuc(msg) {
 function logCyan(msg) {
     console.log("[" + moment().format('DD/MM/YYYY HH:mm:ss') + "] " + chalk.cyan(msg))
 }
+
 
 function checkAuthentification(token, callback) {
     if(token == undefined) { callback(0); return; }
@@ -104,12 +107,20 @@ function getUsername(token, callback) {
 }
 function getUserID(token, callback) {
     if(token == undefined) { callback(undefined); return; }
-    connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", token, function (error, results, fields) {
+    connection.query("SELECT * FROM `accounts` WHERE `authToken`=?", [token], function (error, results, fields) {
         if (error) logErr(error)
         else {
             callback(results[0].UID)
         }
-        });
+    });
+}
+
+// Theme functions //
+function toggleTheme(uid) {
+    mysql_gettheme(uid, function(currentTheme) {
+        if(currentTheme == 1) mysql_changetheme(uid, 0)
+        else mysql_changetheme(uid, 1)
+    })
 }
 
 // Time documentation functions //
@@ -252,7 +263,29 @@ function updateLogging() {
 // Setup functions //
 function updateVersion() {
     version = JSON.parse(fs.readFileSync('package.json')).version
+    try {
+		if(JSON.parse(fs.readFileSync('config.json')).taskhubjs_check_for_updates == true) checkVersion()
+    } catch (ENOENT) {
+		return
+    }
 }
+function checkVersion() {
+	var req = https.request({host: 'api.github.com', port: 443, path: '/repos/holzigerTyp/TaskHubJS/releases/latest', method: 'GET', headers: {'Content-Type': 'application/json', 'user-agent': 'node.js'}}, function(res) {
+		var out = '';
+		res.setEncoding('utf8')
+		res.on('data', function(c) {
+			out += c
+		})
+		res.on('end', function() {
+			var json = JSON.parse(out)
+			if(json.tag_name.replace("v", "") != version) logCyan("A newer version is available (" + json.tag_name.replace("v", "") + "). You can download it at the following link. Please take also a look at the upgrade instructions.")
+				else logSuc("You are using the newest version of TaskHubJS.")
+		})
+	})
+	req.end()
+}
+
+
 function setup() {
     printLogo()
     if(fs.existsSync("config.json")) {
@@ -319,9 +352,9 @@ function setupMySQLDatabase() {
             var rawdata = fs.readFileSync('config.json');
             var config = JSON.parse(rawdata);
 
-            connection.query('CREATE TABLE `' + config.mysql_database + '`.`accounts` ( `UID` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(255) NOT NULL , `hashed` TEXT NOT NULL , `authToken` VARCHAR(255) NOT NULL , `timestampLastLogin` VARCHAR(255) NOT NULL , `rank` VARCHAR(255) NOT NULL , PRIMARY KEY (`UID`)) ENGINE = InnoDB;', function (error, results, fields) {
+            connection.query('CREATE TABLE `' + config.mysql_database + '`.`accounts` ( `UID` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(255) NOT NULL , `hashed` TEXT NOT NULL , `authToken` VARCHAR(255) NOT NULL , `timestampLastLogin` VARCHAR(255) NOT NULL , `rank` VARCHAR(255) NOT NULL , `theme` INT NOT NULL , PRIMARY KEY (`UID`)) ENGINE = InnoDB;', function (error, results, fields) {
                 if (error) logErr(error)
-                connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin")', function (error, results, fields) {
+                connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`, `theme`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin",0)', function (error, results, fields) {
                     if (error) logErr(error)
                 });
             });
@@ -332,7 +365,7 @@ function setupMySQLDatabase() {
         if(results == undefined) return
         if(results.length == 1) return
 
-        connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin")', function (error, results, fields) {
+        connection.query('INSERT INTO `accounts`(`UID`, `username`, `hashed`, `authToken`, `timestampLastLogin`, `rank`, `theme`) VALUES (0,"admin","$2b$08$/EMn2iDepzRaThkXs/nEKOr9WbnTF2DjE364gr4vYGsQTNVf/sL4i","0","0","admin",0)', function (error, results, fields) {
             if (error) logErr(error)
         });
       });
@@ -390,7 +423,7 @@ function mysql_getaccounts(callback) {
     });
 }
 function mysql_createaccount(username, password, prev) {
-    var set = {username: username, hashed: bcrypt.hashSync(password, 8), authToken: 0, timestampLastLogin: 0, rank: prev}
+    var set = {username: username, hashed: bcrypt.hashSync(password, 8), authToken: 0, timestampLastLogin: 0, rank: prev, theme: 0}
     connection.query("INSERT INTO `accounts` SET ?", set, function (error, results, fields) {
         if (error) logErr(error)
     });
@@ -488,6 +521,26 @@ function mysql_usernameexists(username, callback) {
     });
 }
 
+function mysql_changetheme(uid, val) {
+    var sql = "UPDATE `accounts` SET `theme`=? WHERE `UID`=?"
+    connection.query(sql, [val,uid], function (error, results, fields) {
+        if (error) {
+            logErr(error)
+            return false
+        } else return true
+    })
+}
+function mysql_gettheme(uid, callback) {
+    connection.query("SELECT * FROM `accounts` WHERE `UID`=?", uid, function (error, results, fields) {
+        if (error) {
+            logErr(error)
+            callback(0)
+        } else {
+            callback(results[0].theme)
+        }
+    });
+}
+
 // Express //
 debugOutput()
 
@@ -516,13 +569,6 @@ app.set('view engine', 'ejs')
 app.get("/", function(req, res) {
     res.render("index")
 })
-app.get("/login", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
-        if(result == 1) res.redirect("/dashboard")
-        else res.render("login")
-    }) 
-    
-})
 app.get("/logout", function(req, res) {
     removeAuthentification(req.cookies.auth)
     res.redirect("/")
@@ -534,13 +580,7 @@ app.get("/error", function(req, res) {
 app.get("/dashboard", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) res.render("dashboard")
-        else res.redirect("/login")
-    })   
-})
-app.get("/dashboard/:id", function(req, res) {
-    checkAuthentification(req.cookies.auth, (result) => {
-        if(result == 1) res.render("dashboard-details")
-        else res.redirect("/login")
+        else res.redirect("/")
     })   
 })
 
@@ -549,9 +589,9 @@ app.get("/management", function(req, res) {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") res.render("management")
-                else res.render("error-rank")
+                else res.render("error")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })   
 })
 app.get("/management/createaccount", function(req, res) {
@@ -559,9 +599,9 @@ app.get("/management/createaccount", function(req, res) {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") res.render("create-account")
-                else res.render("error-rank")
+                else res.render("error")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })   
 })
 app.get("/management/changeadminpassword", function(req, res) {
@@ -569,23 +609,23 @@ app.get("/management/changeadminpassword", function(req, res) {
         if(result == 1) {
             mysql_getrank(req.cookies.auth, (rank) => {
                 if(rank == "admin") res.render("change-adminpassword")
-                else res.render("error-rank")
+                else res.render("error")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })   
 })
 
 app.get("/createtask", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) res.render("create-task")
-        else res.redirect("/login")
+        else res.redirect("/")
     }) 
 })
 
 app.get("/updatetask/:id", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) res.render("update-task")
-        else res.redirect("/login")
+        else res.redirect("/")
     }) 
 })
 
@@ -610,9 +650,9 @@ app.post("/api/auth", function(req, res) {
                         })
                         updateAuthentification(username, token)
                         res.status(200).redirect("/dashboard")
-                    } else res.redirect("/login")
+                    } else res.redirect("/")
                 })
-            } else res.redirect("/login")
+            } else res.redirect("/")
         }
       });
 })
@@ -626,19 +666,21 @@ app.post("/api/createtask", function(req, res) {
                 taskHandler.createTask(connection, title, description, 1, username)
                 res.redirect("/dashboard/")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.post("/api/updatetask/:id", function(req, res) {
     checkAuthentification(req.cookies.auth, (result) => {
         if(result == 1) {
-            var title = req.body.title
-            var description = req.body.description
+            var title = req.body.updatetitle
+            var description = req.body.updatedescription
+            var status = req.body.updatestatus
+            var priority = req.body.updatepriority
             var id = req.params.id
 
-            taskHandler.updateTask(connection, id, title, description)
-            res.redirect("/dashboard/" + id)
-        } else res.redirect("/login")
+            taskHandler.updateTask(connection, id, title, description, status, priority)
+            res.redirect("/dashboard")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/deletetask/:id", function(req, res) {
@@ -646,7 +688,7 @@ app.get("/api/deletetask/:id", function(req, res) {
         if(result == 1) {
             mysql_deletetask(req.params.id)
             res.redirect("/dashboard")
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/gettasks", function(req, res) {
@@ -656,7 +698,7 @@ app.get("/api/gettasks", function(req, res) {
                 res.setHeader("Content-Type", "application/json")
                 res.status(200).send(list)
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/gettaskdetail/:id", function(req, res) {
@@ -666,7 +708,7 @@ app.get("/api/gettaskdetail/:id", function(req, res) {
                 res.setHeader("Content-Type", "application/json")
                 res.status(200).send(list)
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/getusername/:id", function(req, res) {
@@ -676,7 +718,7 @@ app.get("/api/getusername/:id", function(req, res) {
                 res.setHeader("Content-Type", "application/json")
                 res.status(200).send(list + "")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/getaccounts", function(req, res) {
@@ -688,10 +730,10 @@ app.get("/api/getaccounts", function(req, res) {
                         res.setHeader("Content-Type", "application/json")
                         res.status(200).send(list)
                     })
-                } else res.render("error-rank")
+                } else res.render("error")
             })
             
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.post("/api/createaccount", function(req, res) {
@@ -705,9 +747,9 @@ app.post("/api/createaccount", function(req, res) {
 
                     mysql_createaccount(username, password, prev)
                     res.redirect("/management")
-                } else res.render("error-rank")
+                } else res.render("error")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/deleteaccount/:id", function(req, res) {
@@ -717,9 +759,9 @@ app.get("/api/deleteaccount/:id", function(req, res) {
                 if(rank == "admin") {
                     mysql_deleteaccount(req.params.id)
                     res.redirect("/management")
-                } else res.render("error-rank")
+                } else res.render("error")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.post("/api/changeadminpassword", function(req, res) {
@@ -731,9 +773,9 @@ app.post("/api/changeadminpassword", function(req, res) {
 
                     mysql_changeadminpassword(password)
                     res.redirect("/management")
-                } else res.render("error-rank")
+                } else res.render("error")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.post("/api/changestatus/:id", function(req, res) {
@@ -744,7 +786,7 @@ app.post("/api/changestatus/:id", function(req, res) {
 
             mysql_changestatus(id, status)
             res.redirect("/dashboard/" + id + "#settings")
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.post("/api/changepriority/:id", function(req, res) {
@@ -755,7 +797,7 @@ app.post("/api/changepriority/:id", function(req, res) {
 
             mysql_changepriority(id, priority)
             res.redirect("/dashboard/" + id + "#settings")
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.post("/api/changeassign/:id", function(req, res) {
@@ -769,7 +811,7 @@ app.post("/api/changeassign/:id", function(req, res) {
                     res.redirect("/dashboard/" + id + "#settings")
                 } else res.redirect("/dashboard/" + id + "#settings")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 
@@ -780,7 +822,7 @@ app.get("/api/getlogging/:id", function(req, res) {
                 res.setHeader("Content-Type", "application/json")
                 res.status(200).send(out)
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/startlogging/:id", function(req, res) {
@@ -788,9 +830,9 @@ app.get("/api/startlogging/:id", function(req, res) {
         if(result == 1) {
             getUserID(req.cookies.auth, function(uid) {
                 startLogging(req.params.id, uid)
-                res.redirect("/dashboard/" + req.params.id + "#time")
+                res.redirect("/dashboard")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
     })  
 })
 app.get("/api/stoplogging/:id", function(req, res) {
@@ -798,9 +840,31 @@ app.get("/api/stoplogging/:id", function(req, res) {
         if(result == 1) {
             getUserID(req.cookies.auth, function(uid) {
                 stopLogging(req.params.id, uid)
-                res.redirect("/dashboard/" + req.params.id + "#time")
+                res.redirect("/dashboard")
             })
-        } else res.redirect("/login")
+        } else res.redirect("/")
+    })  
+})
+app.get("/api/toggletheme", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            getUserID(req.cookies.auth, function(uid) {
+                toggleTheme(uid)
+            })
+        } else res.redirect("/")
+    })  
+})
+
+app.get("/api/gettheme", function(req, res) {
+    checkAuthentification(req.cookies.auth, (result) => {
+        if(result == 1) {
+            getUserID(req.cookies.auth, function(uid) {
+                mysql_gettheme(uid, function(theme) {
+                    res.setHeader("Content-Type", "application/json")
+                    res.status(200).send({"theme": theme})
+                })
+            })
+        } else res.redirect("/")
     })  
 })
 
