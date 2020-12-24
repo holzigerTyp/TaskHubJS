@@ -278,7 +278,7 @@ function checkVersion() {
 		})
 		res.on('end', function() {
 			var json = JSON.parse(out)
-			if(json.tag_name.replace("v", "") != version) logCyan("A newer version is available (" + json.tag_name.replace("v", "") + "). You can download it at the following link. Please take also a look at the upgrade instructions.")
+			if(json.tag_name.replace("v", "") != version) logCyan("A newer version is available (" + json.tag_name.replace("v", "") + "). You can download it at the following link. (https://github.com/holzigerTyp/TaskHubJS/releases/tag/" + json.tag_name + ") \nPlease take also a look at the upgrade instructions.")
 				else logSuc("You are using the newest version of TaskHubJS.")
 		})
 	})
