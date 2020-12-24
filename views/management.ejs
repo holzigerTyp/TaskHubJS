@@ -5,75 +5,115 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>TaskHubJS</title>
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <link rel="stylesheet" href="/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
-    <link rel="stylesheet" href="/css/styles.min.css">
-    <link rel="stylesheet" href="/css/smoothproducts.css">
-    <link rel="stylesheet" href="/css/thjs.css">
+    <link id="style" rel="stylesheet">
 </head>
 
-<body style="background: rgb(246,246,246);">
-    <nav class="navbar navbar-light navbar-expand-lg fixed-top bg-light clean-navbar" style="height: 60px">
-        <div class="container"><a class="navbar-brand logo" href="#">TaskHubJS</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse"
-                id="navcol-1">
-                <ul class="nav navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/management">Management</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-                </ul>
+<body>
+    <div id="loader" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <div class="spinner-border text-danger" role="status" style="width: 10rem; height: 10rem;">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+
+    <div id="page" style="display: none">
+        <div class="sidebar-base">
+            <div class="sidebar">
+                <div class="row sidebar-logo-row">
+                    <div class="col"><a href="#" class="sidebar-logo"><img src="/img/thjs-logo.png"/></a></div>
+                </div>
+                <div class="row">
+                    <div class="col"><a href="/dashboard"><i class="fa fa-list-alt"></i></a></div>
+                </div>
+                <div class="row sidebar-item-low-sec">
+                    <div class="col"><a href="/management"><i class="fa fa-gear"></i></a></div>
+                </div>
+                <div class="row sidebar-item-low">
+                    <div class="col"><a href="/logout">&nbsp;<i class="fa fa-lock"></i></a></div>
+                </div>
             </div>
         </div>
-    </nav>
-    <main class="page product-page">
-        <section class="clean-block clean-product dark">
-            <div class="container">
-                <div class="block-content thjs-round" style="margin-top: 100px;">
-                    <div class="product-info">
-                        <div>
-                            <ul class="nav nav-tabs" role="tablist" id="myTab">
-                                <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-toggle="tab" id="general-tab" href="#general">General</a></li>
-                                <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-toggle="tab" id="accounts-tabs" href="#accounts">Accounts</a></li>
-                            </ul>
-                            <div class="tab-content" id="myTabContent">
-                                <div class="tab-pane active fade show specifications" role="tabpanel" id="general">
-                                    <h4 style="margin-top: 0px;">General settings</h4>
-                                    <p>Coming soon...</p>
-                                </div>
-                                <div class="tab-pane fade show specifications" role="tabpanel" id="accounts">
-                                    <h4 style="margin-top: 0px;">Account management</h4><a class="btn btn-primary" href="/management/createaccount" style="margin-top: 30px;margin-bottom: 60px;"><i class="fa fa-user-plus"></i>Create new account</a><a class="btn btn-warning" href="/management/changeadminpassword" style="margin-top: 30px;margin-bottom: 60px; margin-left: 20px"><i class="fa fa-pencil"></i>Change admin password</a>
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Username</th>
-                                                    <th>Privileges</th>
-                                                    <th>Last login</th>
-                                                    <th>Operate</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="sys-tbody"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+        <div class="modal fade" id="changeAdminPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changeAdminPasswordLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="changeAdminPasswordLabel">Change current admin password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="/api/changeadminpassword" method="post" class="thjs-round">
+                        <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
+                        <div class="form-group"><label for="password">Password</label><input class="form-control" type="password" name="password" id="password"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Change admin password</button></form>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
-    <footer class="page-footer dark" style="padding: 0px;">
-        <div class="footer-copyright">
-            <p>Created by holzigerTyp with&nbsp;💙 and Bootstrap Studio Template<br></p>
         </div>
-    </footer>
+
+        <div class="modal fade" id="createNewAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createNewAccountLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="createNewAccountLabel">Create new account</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="/api/createaccount" method="post">
+                        <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
+                        <div class="form-group" style="margin-bottom: 30px"><label for="username">Username</label><input class="form-control item" type="text" name="username" id="username"></div>
+                        <div class="form-group" style="margin-bottom: 30px"><label for="password">Password</label><input class="form-control" type="password" name="password" id="password"></div>
+                        <div class="form-group"><label for="prev">Select privileges: &nbsp;</label><select id="prev" name="prev"><option value="user">User privileges</option><option value="admin">Admin privileges</option></select></div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Create account</button></form>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+        <div class="content">
+            <h1>Settings</h1>
+            <div style="margin-top: 50px; margin-left: 40px;">
+                <form class="form-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="switchTheme" ontoggle="toggleTheme()">
+                        <label class="form-check-label" for="switchTheme">Switch current theme</label>
+                    </div>
+                </form>
+                <form class="form-control" style="margin-top: 50px">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createNewAccount" style="margin-top: 10px;margin-bottom: 60px;"><i class="fa fa-user-plus"></i>&nbsp; Create new account</a><a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#changeAdminPassword" style="margin-top: 10px;margin-bottom: 60px; margin-left: 20px"><i class="fa fa-pencil"></i>&nbsp; Change admin password</a>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Privileges</th>
+                                    <th>Last login</th>
+                                    <th>Operate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sys-tbody"></tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
     <script src="/js/jquery.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
-    <script src="/js/script.min.js"></script>
+    <script src="/js/management.js"></script>
+    <script src="/js/themehandler.js"></script>
+    <script type="text/javascript">jQuery(document).ready(function(){ $("#loader").delay(800).fadeOut(400, function(){ $("#page").fadeIn(400); });  });</script>
     <script>
         $.ajax({
             type: "GET",
@@ -86,8 +126,8 @@
                     var ts = time[0] + "." + time[1] + "." + time[2] + " " + time[3] + ":" + time[4] + ":" + time[5]
                     if(data[i].timestampLastLogin == 0) ts = "unknown"
 
-                    if(data[i].username == "admin") document.getElementById("sys-tbody").innerHTML = document.getElementById("sys-tbody").innerHTML + '<tr><td>' + data[i].username + '</td><td>' + data[i].rank + '</td><td>' + ts + '</td><td></td></tr>'
-                    else document.getElementById("sys-tbody").innerHTML = document.getElementById("sys-tbody").innerHTML + '<tr><td>' + data[i].username + '</td><td>' + data[i].rank + '</td><td>' + ts + '</td><td><a class="btn btn-danger" href="/api/deleteaccount/' + data[i].UID + '"><i class="fa fa-trash"></i>Remove account</a></td></tr>'
+                    if(data[i].username == "admin") document.getElementById("sys-tbody").innerHTML = document.getElementById("sys-tbody").innerHTML + '<tr><td>' + data[i].username + '</td><td>' + data[i].rank + '</td><td>' + ts + '</td><td>No operations possible</td></tr>'
+                    else document.getElementById("sys-tbody").innerHTML = document.getElementById("sys-tbody").innerHTML + '<tr><td>' + data[i].username + '</td><td>' + data[i].rank + '</td><td>' + ts + '</td><td><a class="btn btn-danger" href="/api/deleteaccount/' + data[i].UID + '"><i class="fa fa-trash"></i>&nbsp; Remove account</a></td></tr>'
                 }
             }
         });

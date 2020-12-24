@@ -5,54 +5,214 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>TaskHubJS</title>
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
-    <link rel="stylesheet" href="/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
-    <link rel="stylesheet" href="/css/styles.min.css">
-    <link rel="stylesheet" href="/css/smoothproducts.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/fonts/font-awesome.min.css">    
+    <link id="style" rel="stylesheet">
 </head>
 
-<body style="background: rgb(246,246,246);">
-    <nav class="navbar navbar-light navbar-expand-lg fixed-top bg-light clean-navbar" style="height: 60px">
-        <div class="container"><a class="navbar-brand logo" href="#">TaskHubJS</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse"
-                id="navcol-1">
-                <ul class="nav navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link active" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/management">Management</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-                </ul>
-            </div>
+<body>
+    <div id="loader" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <div class="spinner-border text-danger" role="status" style="width: 10rem; height: 10rem;">
+            <span class="sr-only">Loading...</span>
         </div>
-    </nav>
-    <main class="page product-page">
-        <section class="clean-block clean-product dark">
-            <div class="container">
-                <div class="block-heading">
-                    <h2 class="text-info"></h2>
+    </div>
+
+
+    <div id="page" style="display: none">
+        <div class="sidebar-base">
+            <div class="sidebar">
+                <div class="row sidebar-logo-row">
+                    <div class="col"><a href="#" class="sidebar-logo"><img src="/img/thjs-logo.png"/></a></div>
                 </div>
-                <div class="block-content">
-                    <div class="product-info">
-                        <a class="btn btn-primary" href="/dashboard" style="margin-bottom: 60px"><i class="fa fa-arrow-circle-left"></i>Back to dashboard</a>
-                            <h3 id="sys-title">An error occurred.</h3>
-                            <div class="rating">
-                                <p style="color: black;" id="sys-timestamp">Mayby you have tried to access a page without admin privileges or a general error occurred. Please try again later.</p>
-                            </div>
-                    </div>
+                <div class="row">
+                    <div class="col"><a href="/dashboard"><i class="fa fa-list-alt"></i></a></div>
+                </div>
+                <div class="row sidebar-item-low-sec">
+                    <div class="col"><a href="/management"><i class="fa fa-gear"></i></a></div>
+                </div>
+                <div class="row sidebar-item-low">
+                    <div class="col"><a href="/logout">&nbsp;<i class="fa fa-lock"></i></a></div>
                 </div>
             </div>
-        </section>
-    </main>
-    <footer class="page-footer dark" style="padding: 0px;">
-        <div class="footer-copyright">
-            <p>Created by holzigerTyp with&nbsp;💙 and Bootstrap Studio Template<br></p>
         </div>
-    </footer>
+
+        <div class="content">
+            <h1>An error occurred.</h1>
+            <p>Oooops. You should not be here. Maybe you have tried to access a page without admin privileges. Please try again later and switch back to the dashboard.</p>
+            <a class="btn btn-warning content-inline" href="/dashboard"><i class="fa fa-refresh"></i>&nbsp; Back to dashboard</a>
+        </div>
+    </div>
     <script src="/js/jquery.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
-    <script src="/js/script.min.js"></script>
-</body>
+    <script src="/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script></body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.jchtens"></script>
+    <script src="/js/themehandler.js"></script>
+    <script type="text/javascript">jQuery(document).ready(function(){ $("#loader").delay(800).fadeOut(400, function(){ $("#page").fadeIn(400); });  });</script>
+    <script type="text/javascript">
+        var taskDetailsModal = document.getElementById('taskDetailsModal')
+        taskDetailsModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+
+            var tid = button.getAttribute('data-bs-tid')
+
+            var modalTitle = taskDetailsModal.querySelector('.modal-title')
+
+            $.ajax({
+                type: "GET",
+                url: window.location.protocol + '//' + window.location.host + "/api/gettaskdetail/" + tid,
+                crossDomain: false,
+                dataType: "json",
+                success: function(data) {
+                    for (i = 0; i < data.length; i++) {
+                        var stat = "Error"
+                        var col = ""
+                        if(data[i].status == 0) {
+                            stat = "Open"
+                            col = "primary"
+                        } else if(data[i].status == 1) {
+                            stat = "In progress"
+                            col = "warning"
+                        } else if(data[i].status == 2) {
+                            stat = "Finished"
+                            col = "success"
+                        } else if(data[i].status == 3) {
+                            stat = "Information"
+                            col = "info"
+                        }
+
+
+                        var prio = "Error"
+                        var colPrio = ""
+                        if(data[i].priority == 0) {
+                            prio = "Low"
+                            colPrio = "secondary"
+                        } else if(data[i].priority == 1) {
+                            prio = "Normal"
+                            colPrio = "info"
+                        } else if(data[i].priority == 2) {
+                            prio = "Urgent"
+                            colPrio = "danger"
+                        }
+
+                        document.getElementById("taskDetailsModalLabel").innerHTML = data[i].title
+                        document.getElementById("sys-description").innerHTML = "<b>Description: </b>" + data[i].description
+                        var time = data[i].timestampCreated.split("/")
+                        document.getElementById("sys-timestamp").innerText = "Created at " + time[0] + "." + time[1] + "." + time[2] + " " + time[3] + ":" + time[4] + ":" + time[5]
+                        document.getElementById("sys-priority").innerHTML = 'Priority:&nbsp;<span class="badge bg-' + colPrio + '">' + prio + '</span>'
+                        document.getElementById("sys-status").innerHTML = 'Status:&nbsp;<span class="badge bg-' + col + '">' + stat + '</span>'
+                        document.getElementById("sys-assignment").innerHTML = 'Assigned to:&nbsp;<span class="badge bg-secondary">' + data[i].assignment + '</span>'
+                        document.getElementById("sys-delete").href = '/api/deletetask/' + tid 
+                        document.getElementById("sys-edit").setAttribute("data-bs-tid", tid)
+                        document.getElementById("sys-timemanager").setAttribute("data-bs-tid", tid)
+                    }
+                }
+            })
+        })
+    </script>
+
+    <script type="text/javascript">
+        var taskUpdateModal = document.getElementById('updateTaskModal')
+        taskUpdateModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+
+            var tid = button.getAttribute('data-bs-tid')
+
+            var modalTitle = taskUpdateModal.querySelector('.modal-title')
+
+            $.ajax({
+                type: "GET",
+                url: window.location.protocol + '//' + window.location.host + "/api/gettaskdetail/" + tid,
+                crossDomain: false,
+                dataType: "json",
+                success: function(data) {
+                    for (i = 0; i < data.length; i++) {
+                        var stat = "Error"
+                        var col = ""
+                        if(data[i].status == 0) {
+                            stat = "Open"
+                            col = "primary"
+                            $("#updatestatus").prop('selectedIndex', 0);
+                        } else if(data[i].status == 1) {
+                            stat = "In progress"
+                            col = "warning"
+                            $("#updatestatus").prop('selectedIndex', 1);
+                        } else if(data[i].status == 2) {
+                            stat = "Finished"
+                            col = "success"
+                            $("#updatestatus").prop('selectedIndex', 2);
+                        } else if(data[i].status == 3) {
+                            stat = "Information"
+                            col = "info"
+                            $("#updatestatus").prop('selectedIndex', 3);
+                        }
+
+
+                        var prio = "Error"
+                        var colPrio = ""
+                        if(data[i].priority == 0) {
+                            prio = "Low"
+                            colPrio = "secondary"
+                            $("#updatepriority").prop('selectedIndex', 0);
+                        } else if(data[i].priority == 1) {
+                            prio = "Normal"
+                            colPrio = "info"
+                            $("#updatepriority").prop('selectedIndex', 1);
+                        } else if(data[i].priority == 2) {
+                            prio = "Urgent"
+                            colPrio = "danger"
+                            $("#updatepriority").prop('selectedIndex', 2);
+                        }
+
+                        document.getElementById("updatetitle").value = data[i].title
+                        document.getElementById("updatedescription").innerText = data[i].description
+                        $("#sys-update-form").attr("action", "/api/updatetask/" + tid)
+                        
+                    }
+                }
+            })
+        })
+    </script>
+
+    <script type="text/javascript">
+
+		function secondConverter(seconds) { seconds = Number(seconds); var d = Math.floor(seconds / (3600*24)); var h = Math.floor(seconds % (3600*24) / 3600); var m = Math.floor(seconds % 3600 / 60); var s = Math.floor(seconds % 60); var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : ""; var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : ""; var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : ""; var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : ""; return dDisplay + hDisplay + mDisplay + sDisplay; }
+
+        var timemanagerTaskModal = document.getElementById('timemanagerTaskModal')
+        timemanagerTaskModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+
+            var tid = button.getAttribute('data-bs-tid')
+
+            $.ajax({
+                type: "GET",
+                url: window.location.protocol + '//' + window.location.host + "/api/gettaskdetail/" + tid,
+                crossDomain: false,
+                dataType: "json",
+                success: function(data) {
+                    for (i = 0; i < data.length; i++) {
+                        document.getElementById("timemanagerTaskModalLabel").innerHTML = data[i].title
+                        document.getElementById("sys-time-start").href = '/api/startlogging/' + tid 
+                        document.getElementById("sys-time-stop").href = '/api/stoplogging/' + tid 
+                    }
+                }
+            })
+
+            $.ajax({
+	            type: "GET",
+	            url: window.location.protocol + '//' + window.location.host + "/api/getlogging/" + tid,
+	            crossDomain: false,
+	            dataType: "json",
+	            success: function(logdata) {
+	                for (i = 0; i < logdata.length; i++) {
+	                    document.getElementById("sys-time").innerHTML = document.getElementById("sys-time").innerHTML + '<span class="badge bg-info">' + logdata[i][0] + "</span> : " + secondConverter(logdata[i][1]) + "</br>"
+	                }
+	                if(logdata.length == 0) {
+	                    document.getElementById("sys-time").innerHTML = '<span class="badge bg-info">No data captured yet</span>'
+	                }
+	            }
+	        })
+        })
+    </script>
+
 
 </html>

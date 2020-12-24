@@ -5,28 +5,54 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>TaskHubJS</title>
-    <link rel="stylesheet" href="assets-index/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic">
-    <link rel="stylesheet" href="assets-index/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="assets-index/fonts/simple-line-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/fonts/font-awesome.min.css">    
+    <link rel="stylesheet" href="/css/light.css">
 </head>
 
-<body id="page-top">
-    <header class="d-flex masthead" style="background: url(&quot;assets-index/img/background.png&quot;) center / contain no-repeat;">
-        <div class="container my-auto text-center">
-            <h1 class="mb-1" style="color: #242a38;text-align: left;"></h1>
-            <div class="overlay" style="text-align: left;margin-top: 150px;"><a class="btn btn-primary btn-xl js-scroll-trigger" role="button" href="/login" style="background: linear-gradient(-146deg, #f78361, #f54b64);margin-left: 60px;">Start using</a></div>
+<body>
+    <div class="sidebar-base">
+        <div class="sidebar">
+            <div class="row sidebar-logo-row">
+                <div class="col"><a href="#" class="sidebar-logo"><img src="/img/thjs-logo.png"/></a></div>
+            </div>
+            <div class="row sidebar-item-low">
+                <div class="col"><a data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa fa-unlock"></i></a></div>
+            </div>
         </div>
-    </header>
-    <footer class="footer text-center">
-        <div class="container">
-            <ul class="list-inline mb-5">
-                <li class="list-inline-item">&nbsp;<a class="text-white social-link rounded-circle" href="https://github.com/holzigerTyp/TaskHubJS" style="background: linear-gradient(#f78361, #f54b64);"><i class="icon-social-github"></i></a></li>
-            </ul>
-            <p class="text-muted mb-0 small"><br>Created&nbsp;by&nbsp;holzigerTyp&nbsp;with 💙&nbsp;and&nbsp;Bootstrap&nbsp;Studio&nbsp;Template<br></p>
-        </div></footer>
-    <script src="assets-index/js/jquery.min.js"></script>
-    <script src="assets-index/bootstrap/js/bootstrap.min.js"></script>
-</body>
+    </div>
 
+    <div class="modal fade" id="loginModal" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Please authentificate</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/api/auth" method="post" style="background-color: rgba(255,255,255,1); border-radius: 20px;">
+                        <h2 class="sr-only">Login Form</h2>
+                        <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
+                        <div class="form-group" style="margin-bottom: 30px"><input class="form-control" type="text" name="username" id="username" placeholder="Username" style="background-color: rgba(0,0,0,0);" autofocus></div>
+                        <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password" style="background-color: rgba(0,0,0,0.0);"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Log in</button></form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Welcome to TaskHubJS</h1>
+        <p>TaskHubJS is a nodeJS based task organizer that is right in your browser. With the beautiful possibilities of expressJS and other npm packages it is possible to create a task organizer for your needs.</br></br>
+        This project is licensed under GNU General Public License v3.0.</p>
+    	</br></br>
+        <div class="content-inline">
+        	<a class="btn btn-primary" href="https://github.com/holzigerTyp/TaskHubJS/blob/master/LICENSE"><i class="fa fa-github"></i>&nbsp; View license at GitHub</a>
+        	<a class="btn btn-primary" href="https://github.com/holzigerTyp/TaskHubJS/"><i class="fa fa-github"></i>&nbsp; View GitHub repository</a>
+        </div>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script></body>
 </html>
