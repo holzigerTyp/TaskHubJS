@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+html, body {
+    height: 100%;
+    width: 100%;
+    background-color: #ffffff;
+    font-family: 'Montserrat';
+}
+
+/* 
+Sidebar and sidebar items
+*/
+
+.sidebar-base {
+    position: fixed;
+    background-color: #ffffff;
+    width: 90px;
+    height: 100%;
+}
+
+.sidebar-logo {
+    margin-left: 0px !important;
+}
+
+.sidebar-logo-row {
+    margin-bottom: 30px;
+    margin-left: -1px;
+}
+
+.sidebar {
+    position: absolute;
+    align-items: center;
+    width: 90px;
+    height: 100%;
+    display: list-item;
+    justify-content: center;
+    background-color: #eeeeee;
+    box-shadow: 0 15px 10px 10px rgba(0, 0, 0, 0.246);
+}
+
+.sidebar a {
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.sidebar a:hover {
+    text-decoration: none;
+    color: #4F6D7A;
+}
+
+.sidebar .row .col i {
+    font-size: 30px;
+    color: #4F6D7A;
+}
+
+.sidebar .col {
+    height: 90px;
+    padding-top: 30px;
+}
+
+.sidebar-item-low {
+    position: absolute;
+    bottom: 0;
+}
+
+.sidebar-item-low-sec {
+    position: absolute;
+    bottom: 90px;
+}
+
+
+/*
+Content of webpage (right side)
+*/
+
+.content {
+    margin-left: 90px;
+    position: absolute;
+}
+
+.content h1 {
+    margin-left: 30px;
+    margin-top: 30px;
+}
+
+.content p {
+    margin-left: 50px;
+}
+
+.content-inline {
+    margin-left: 50px;
+}
+
+.content table thead tr th {
+    border-top-width: 0 !important;
+    border-bottom-width: 4px;
+}
