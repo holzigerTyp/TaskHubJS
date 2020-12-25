@@ -8,19 +8,14 @@ function initTasks() {
             if(data.length != 0) {
                 for (var i = 0; i < data.length; i++) {
                     var stat = "Error"
-                    var col = ""
                     if(data[i].status == 0) {
                         stat = "Open"
-                        col = "primary"
                     } else if(data[i].status == 1) {
                         stat = "In progress"
-                        col = "warning"
                     } else if(data[i].status == 2) {
                         stat = "Finished"
-                        col = "success"
                     } else if(data[i].status == 3) {
                         stat = "Information"
-                        col = "info"
                     }
     
     
