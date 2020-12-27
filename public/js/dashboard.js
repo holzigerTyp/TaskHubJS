@@ -51,8 +51,10 @@ function initTasks() {
 }
 
 function clearTaskList() {
-    var doc = document.getElementById("overview")
-    doc.innerHTML = ""
+    document.getElementById("table-open").innerHTML = "";
+    document.getElementById("table-inprogress").innerHTML = "";
+    document.getElementById("table-finished").innerHTML = "";
+    document.getElementById("table-information").innerHTML = "";
 }
 
 function initTasksExceptFilter() {
@@ -163,11 +165,7 @@ function initTasksExceptSearch() {
                         colPrio = "danger"
                     }
 
-                    var doc = document.getElementById("overview")
-                    if((data[i].title + "").includes(search.value)) insertTask(doc, stat, col, prio, colPrio, data, i)
-                }
-                if(document.getElementById("overview").innerHTML === "") {
-                    insertErrorTask()
+                    if((data[i].title + "").includes(search.value)) insertTask(stat, col, prio, colPrio, data, i)
                 }
             } else {
                 insertErrorTask()
@@ -176,8 +174,15 @@ function initTasksExceptSearch() {
     });
 }
 
-function insertTask(doc, stat, col, prio, colPrio, data, i) {
-    doc.innerHTML = doc.innerHTML + '<div class="col-12 col-md-6 col-lg-4 sys-col" id="' + stat.toLowerCase() + '/' + prio.toLowerCase() + '"><div class="clean-product-item"><div class="image"><a href="#"></a></div><div class="product-name"><a href="/dashboard/' + data[i].ID + '">' + data[i].title + '</a></div><div class="about"><div class="rating"><span class="badge badge-' + col + '">' + stat + '</span></div><div class="price"><span class="badge badge-primary badge-' + colPrio + '">' + prio + '</span></div></div></div></div>'
+function insertTask(stat, col, prio, colPrio, data, i) {
+    var open = document.getElementById("table-open");
+    var inprog = document.getElementById("table-inprogress");
+    var finished = document.getElementById("table-finished");
+    var info = document.getElementById("table-information");
+    if(stat == "Open") open.innerHTML = open.innerHTML + '<tr><td><a data-bs-tid="' + data[i].ID + '" data-bs-toggle="modal" data-bs-target="#taskDetailsModal" style="text-decoration: none; color: #4F6D7A;">' + data[i].title + '</a></td><td><span class="badge bg-' + colPrio + '">' + prio + '</span></td><td><span class="badge bg-secondary">' + data[i].assignment + '</span></td></tr>'
+    if(stat == "In progress") inprog.innerHTML = inprog.innerHTML + '<tr><td><a data-bs-tid="' + data[i].ID + '" data-bs-toggle="modal" data-bs-target="#taskDetailsModal" style="text-decoration: none; color: #4F6D7A;">' + data[i].title + '</a></td><td><span class="badge bg-' + colPrio + '">' + prio + '</span></td><td><span class="badge bg-secondary">' + data[i].assignment + '</span></td></tr>'
+    if(stat == "Finished") finished.innerHTML = finished.innerHTML + '<tr><td><a data-bs-tid="' + data[i].ID + '" data-bs-toggle="modal" data-bs-target="#taskDetailsModal" style="text-decoration: none; color: #4F6D7A;">' + data[i].title + '</a></td><td><span class="badge bg-' + colPrio + '">' + prio + '</span></td><td><span class="badge bg-secondary">' + data[i].assignment + '</span></td></tr>'
+    if(stat == "Information") info .innerHTML = info .innerHTML + '<tr><td><a data-bs-tid="' + data[i].ID + '" data-bs-toggle="modal" data-bs-target="#taskDetailsModal" style="text-decoration: none; color: #4F6D7A;">' + data[i].title + '</a></td><td><span class="badge bg-' + colPrio + '">' + prio + '</span></td><td><span class="badge bg-secondary">' + data[i].assignment + '</span></td></tr>'
 }
 function insertErrorTask() {
     var doc = document.getElementById("overview")
