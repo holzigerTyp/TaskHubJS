@@ -97,7 +97,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning">Update task</button></form>
+                        <button type="submit" class="btn btn-warning"><i class="fa fa-refresh"></i>&nbsp; Update task</button></form>
                     </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
                     <div class="modal-footer">
                         <a type="button" id="sys-edit" class="btn btn-warning" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#updateTaskModal" style="width: 80.33px; left: 10px; position: absolute !important;"><i class="fa fa-refresh"></i>&nbsp; Edit</a>
                         <a type="button" id="sys-delete" class="btn btn-danger" style="left: 110.33px; position: absolute !important;"><i class="fa fa-trash"></i>&nbsp; Delete</a>
-                        <button type="button" id="sys-timemanager" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#timemanagerTaskModal">Time statistics</button>
+                        <button type="button" id="sys-timemanager" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#timemanagerTaskModal"><i class="fa fa-clock-o"></i>&nbsp; Time statistics</button>
                     </div>
                 </div>
             </div>
@@ -130,7 +130,13 @@
             <h1>Dashboard</h1>
             <div class="btn-group" style="margin-left: 40px; margin-top: 20px;">
                 <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTaskModal"><i class="fa fa-pencil"></i>&nbsp; Create new task</a>
-                <a class="btn btn-warning" href="/dashboard"><i class="fa fa-refresh"></i>&nbsp; Refresh filter</a>
+                <a class="btn btn-warning" href="/dashboard"><i class="fa fa-refresh"></i>&nbsp; Refresh filter / search</a>
+            </div>
+            <div class="input-group mb-3" style="margin-left: 40px; margin-top: 20px; width: 300px; height: 38px;">
+                <input type="text" class="form-control" placeholder="Search by title" id="search" style="height: 38px;">
+                <div class="input-group-append">
+                  	<button class="btn btn-info" type="button" id="searchBtn" onclick="updateSearch()" style="margin-bottom: 30px;"><i class="fa fa-search"></i></button>
+                </div>
             </div>
             <table class="table" style="margin-top: 50px; margin-left: 40px; margin-bottom: 50px; width: 90vw;">
                 <thead>
@@ -186,6 +192,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script></body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
     <script src="/js/themehandler.js"></script>
+    <script src="/js/search.js"></script>
     <script type="text/javascript">jQuery(document).ready(function(){ $("#loader").delay(800).fadeOut(400, function(){ $("#page").fadeIn(400); });  });</script>
     <script type="text/javascript">
         var taskDetailsModal = document.getElementById('taskDetailsModal')
