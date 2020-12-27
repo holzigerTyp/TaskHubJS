@@ -47,7 +47,7 @@
                         <form action="/api/createtask" method="post" class="thjs-round">
                             <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
                             <div class="form-group"><label for="name">Title</label><input class="form-control item" type="text" name="title" id="title"></div>
-                            <div class="form-group"><label for="description">Description</label><textarea class="form-control txarea" name="description" id="description" style="height: 500px; min-height: 500px; max-height: 500px;"></textarea></div>
+                            <div class="form-group"><label for="description">Description</label><textarea class="form-control txarea" name="description" id="description" style="height: 300px; min-height: 300px; max-height: 300px;"></textarea></div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -87,7 +87,7 @@
                         <form id="sys-update-form" method="post" class="thjs-round">
 		                    <input type="hidden" name="_csrf" id="_csrf" value="<%= csrftoken %>">
 		                    <div class="form-group"><label for="updatetitle">Title</label><input class="form-control item" type="text" name="updatetitle" id="updatetitle"></div>
-		                    <div class="form-group"><label for="updatedescription">Description</label><textarea class="form-control txarea" name="updatedescription" id="updatedescription" style="height: 500px; min-height: 500px; max-height: 500px; margin-bottom: 50px;"></textarea></div>
+		                    <div class="form-group"><label for="updatedescription">Description</label><textarea class="form-control txarea" name="updatedescription" id="updatedescription" style="height: 200px; min-height: 200px; max-height: 200px; margin-bottom: 50px;"></textarea></div>
 
 		                    <div class="form-group" style="margin-bottom: 20px"><label for="updatepriority">Priority: &nbsp;&nbsp;</label><select style="width:200px" id="updatepriority" name="updatepriority"><option value="0">Low priority</option><option value="1">Normal priority</option><option value="2">Urgent priority</option></select></div>
 
