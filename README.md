@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Logo" src="https://i.imgur.com/j2ztbhS.png"/></br>
+  <img alt="Logo" src="https://i.imgur.com/gfEazOT.png"/></br>
   <a href="https://lgtm.com/projects/g/holzigerTyp/TaskHubJS/"><img alt="undefined" src="https://img.shields.io/lgtm/grade/javascript/github/holzigerTyp/TaskHubJS.svg?logo=lgtm&logoWidth=18" /></a></br>
 <img alt="undefined" src="https://badgen.net/github/license/holzigertyp/taskhubjs" />  <img alt="undefined" src="https://badgen.net/github/watchers/holzigertyp/taskhubjs" />  <img alt="undefined" src="https://badgen.net/github/commits/holzigertyp/taskhubjs" />
 </p></br>
@@ -9,7 +9,7 @@ With the beautiful possibilities of expressJS and other npm packages it is possi
 
 #### Important information
 I am right at the starting point of the project so it is possible that some bugs are still there and some features are not included yet.
-I try to give my best to bring this project always on so stay tuned for the first release of this project.
+I try to give my best to bring this project always on so stay tuned for the coming releases of this project.
 
 
 ## ☕ Get started
@@ -33,13 +33,9 @@ Password: taskhubadmin
 6. Enjoy using TaskHubJS :)
 
 
-## 🕑 Planed features
-- [x] Sort tasks by status or priority
-- [x] Edit tasks
-- [x] Assign tasks to different users
-- [x] Search bar in dashboard
-- [x] Time documentation
-- [ ] Redesign
+## 🕑 Planed tasks
+- [ ] Assign tasks to different users
+- [ ] Fix time documentation
 
 
 ## 📦 Used npm packages
